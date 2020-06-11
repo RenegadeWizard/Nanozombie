@@ -29,3 +29,6 @@
 .history
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux
+
+# Clion
+cmake-build-debug/
