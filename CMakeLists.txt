@@ -11,7 +11,7 @@ add_executable(nanozombie
 
 target_link_libraries(nanozombie ${MPI_LIBRARIES})
 
-include_directories(.)
+#include_directories(.)
 include_directories(${MPI_INCLUDE_PATH})
 if (MPI_COMPILE_FLAGS)
     set_target_properties(nanozombie PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
