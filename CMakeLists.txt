@@ -6,8 +6,8 @@ find_package(MPI REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(nanozombie
-        nano_struct.h
-        nanozombie.c)
+        src/nano_struct.h
+        nanozombie.cpp src/Voyager.cpp src/Voyager.h)
 
 target_link_libraries(nanozombie ${MPI_LIBRARIES})
 
