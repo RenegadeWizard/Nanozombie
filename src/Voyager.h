@@ -14,7 +14,7 @@ public:
     Voyager(int id, int size);
 
     void receive_message(Message *msg);
-    void send_message(Message *msg);
+    void send_message(Message *msg); // pozwoliłem przenieść sobie tą użyteczność do samego Message, (bo jestem upośledzony i wolę robić wzsytsko tylko nie zajmowac się normalną robotą), w razie czego wszystko wrócę do sanu poprzedniego
 
 private:
     int id; // id procesu w którym wykonywany jest kod

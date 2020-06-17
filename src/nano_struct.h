@@ -26,6 +26,11 @@ struct Message {
     int data;
     MessageType msgType;
     Resource resource;
+
+    Message();
+    Message(unsigned int timestamp, int sender, int receiver = 0);
+    void send();
+    void broadcast(int voyagers);
 };
 
 #endif

@@ -17,6 +17,8 @@ Voyager::Voyager(int id, int size) {
 
 void Voyager::receive_message(Message *msg) {
 
+    timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
+
     switch (state) {
         case START:
             handle_START(msg);
@@ -46,10 +48,10 @@ void Voyager::handle_START(Message *msg) {
 }
 
 void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
-    auto *send = new Message();
-    send->timestamp = timestamp;
-    send->receiver_id = msg->sender_id;
-    send->sender_id = id;
+    auto *send = new Message(timestamp, id, msg->sender_id); // przepraszam, nie chciałem się wpieprzać od nie mojego kodu, ale mam nadzieję, że nic nie zepsułem (nie mogłem się powstrzymać)
+//    send->timestamp = timestamp;
+//    send->receiver_id = msg->sender_id;
+//    send->sender_id = id;
 
     switch (msg->msgType) {
         case REQ:
@@ -80,7 +82,8 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             printf("To sie nie powinno było wydarzyć (handle_REQUESTING_COSTUME -> default w switch dostał wiadomość: %d)", msg->msgType);
             break;
     }
-    send_message(send);
+//    send_message(send);
+    send->send();
     delete send;
 }
 
