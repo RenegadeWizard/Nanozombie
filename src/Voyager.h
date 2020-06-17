@@ -17,8 +17,8 @@ public:
     void send_message(Message *msg);
 
 private:
-    int id;
-    int size;
+    int id; // id procesu w którym wykonywany jest kod
+    int size; // ilość wszystkich procesów
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
@@ -42,6 +42,8 @@ private:
     void check_VALID_COSTUME();
 
     int get_RANDOM_NUMBER(int, int);
+
+    void logger(char *msg);
 
 };
 

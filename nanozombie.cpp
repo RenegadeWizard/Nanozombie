@@ -13,8 +13,6 @@ int main(int argc, char* argv[]){
 
     auto *voyager = new Voyager(id, size);
 
-    printf("Size: %d\tid: %d\n", size, id);
-
     //TODO: jakieś odczytywanie w pętli przychodzących wiadomości i wywoływanie tego niżej
 //    voyager->receive_message(msg);
 
