@@ -4,17 +4,36 @@
 
 #include "Voyager.h"
 #include <cstdio>
+#include <unistd.h>
 
 
 Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
     rng.seed(time(nullptr));
     i("Zaczynamy");
-    //TODO: rozpoczęcie czekania losowego czasu, a potem ubiegania się o kostium
-    send_REQUEST_COSTUME(new Message());    // TODO
 }
 
-void Voyager::receive_message(Message *msg) {
+void Voyager::operator()() {
+    wait_FOR_COSTUME();
+}
+
+void Voyager::wait_FOR_COSTUME() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(get_RANDOM_NUMBER(500, 5000)));
+    mutex.lock();
+    state = REQUESTING_COSTUME;
+    auto send = new Message(timestamp, id, 0);
+    send->msgType = REQ;
+    send->resource = COSTUME;
+    send->broadcast(size);
+    delete send;
+    mutex.unlock();
+}
+
+void Voyager::receive_message() {
+    MPI_Status status;
+    Message* msg;
+    MPI_Recv( &msg, 1, Singleton::getInstance().getDataType(), MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    mutex.lock();
 
     timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
 
@@ -38,10 +57,7 @@ void Voyager::receive_message(Message *msg) {
             handle_REQUESTING_VESSEL(msg);
             break;
     }
-
-}
-
-void Voyager::send_message(Message *msg) {
+    mutex.unlock();
 
 }
 
@@ -72,10 +88,7 @@ void Voyager::handle_START(Message *msg) {
 }
 
 void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
-    auto *send = new Message(timestamp, id, msg->sender_id); // przepraszam, nie chciałem się wpieprzać od nie mojego kodu, ale mam nadzieję, że nic nie zepsułem (nie mogłem się powstrzymać)
-//    send->timestamp = timestamp;
-//    send->receiver_id = msg->sender_id;
-//    send->sender_id = id;
+    auto *send = new Message(timestamp, id, msg->sender_id);
 
     switch (msg->msgType) {
         case REQ:
@@ -86,9 +99,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             }
             break;
         case DEN:
-            count = 0;
-            count_all = 0;
-            send_REQUEST_COSTUME(new Message());    // TODO
+            wasDEN = true;
             break;
         case REP:
             count++;
@@ -103,20 +114,23 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             send->msgType = DEN;
             break;
         default:
-//            printf("To sie nie powinno było wydarzyć (handle_REQUESTING_COSTUME -> default w switch dostał wiadomość: %d)", msg->msgType);
             e("To sie nie powinno było wydarzyć", msg);
             break;
     }
-//    send_message(send);
     send->send();
     delete send;
 }
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size) {
-        if (count + 1 < COSTUME_QUANTITY)
-            state = static_cast<State>(get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1));
-        count = count_all = 0;
+        if (count + 1 < COSTUME_QUANTITY && !wasDEN) {
+            state = static_cast<State>(get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1));  // ubieganie sie o randomowy statek
+        } else {
+            count = count_all = 0;
+            wasDEN = false;
+            std::thread thread(std::ref(*&*this));  // To wygląda źle
+        }
+
     }
 }
 
@@ -195,21 +209,35 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawoz
 }
 
 void Voyager::handle_SIGHTSEEING(Message *msg) {
-
+    auto *send = new Message(timestamp, id, msg->sender_id);
+    switch (msg->msgType) {
+        case REQ:
+            if(msg->resource == (Resource)state){
+                send->msgType = DEN;
+            } else if(msg->resource == COSTUME){
+                send->msgType = REP;
+            } else {
+                send->msgType = RES;
+            }
+            break;
+        case TIC:
+            send->msgType = DEN;
+            break;
+        default:
+            e("To sie nie powinno było wydarzyć", msg);
+            break;
+    }
+    send->send();
+    delete send;
 }
 
 void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 
 }
 
-void Voyager::send_REQUEST_COSTUME(Message *msg) {
-//    dla każdego odbiorcy (broadcast):
-    send_message(msg);
-}
-
 int Voyager::get_RANDOM_NUMBER(int a, int b) {
-    std::uniform_int_distribution<std::mt19937::result_type> dist6(a, b);
-    return dist6(rng);
+    std::uniform_int_distribution<std::mt19937::result_type> dist_ab(a, b);
+    return dist_ab(rng);
 }
 
 int Voyager::getId() const {

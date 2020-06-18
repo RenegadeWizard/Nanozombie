@@ -9,14 +9,17 @@
 #include "Logger.h"
 #include <random>
 #include <ctime>
+#include <thread>
+#include <mutex>
+#include <chrono>
 
 class Voyager : private Logger{
 public:
     Voyager(int id, int size);
 
-    void receive_message(Message *msg);
+    void receive_message();
 
-    void send_message(Message *msg); // pozwoliłem przenieść sobie tą użyteczność do samego Message, (bo jestem upośledzony i wolę robić wzsytsko tylko nie zajmowac się normalną robotą), w razie czego wszystko wrócę do sanu poprzedniego
+    void operator()();
 
 private:
 //    int id; // id procesu w którym wykonywany jest kod
@@ -24,12 +27,16 @@ private:
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
+    bool wasDEN = false;
 //    State state = START;
     std::mt19937 rng;
+    std::mutex mutex;
 
     // trochę pospamowałem tymi funkcjiami (do obsługi poszczególnych typów wiadomości), ale zdaje mi się, że tak będzie bardziej przejrzyście
     // bo jak się nagle pojawi switch w switch to cała przejrzystość pójdzie w las, możliwe, że niektóre przypadki będą na tyle łatwe, że się usunie taką metodę
     void handle_START(Message *msg);
+
+    void wait_FOR_COSTUME();
 
     void handle_REQUESTING_COSTUME(Message *msg);
 
@@ -42,8 +49,6 @@ private:
 
     bool get_ACK = false;
     void handle_WANT_DEPARTURE(Message *msg);
-
-    void send_REQUEST_COSTUME(Message *msg);
 
     void check_VALID_COSTUME();
 
