@@ -11,12 +11,29 @@ Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
     rng.seed(time(nullptr));
     i("Zaczynamy");
-    //TODO: rozpoczęcie czekania losowego czasu, a potem ubiegania się o kostium
-    sleep(get_RANDOM_NUMBER(1, 5));
-    (new Message())->broadcast(size);    // TODO
 }
 
-void Voyager::receive_message(Message *msg) {
+void Voyager::operator()() {
+    wait_FOR_COSTUME();
+}
+
+void Voyager::wait_FOR_COSTUME() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(get_RANDOM_NUMBER(500, 5000)));
+    mutex.lock();
+    state = REQUESTING_COSTUME;
+    auto send = new Message(timestamp, id, 0);
+    send->msgType = REQ;
+    send->resource = COSTUME;
+    send->broadcast(size);
+    delete send;
+    mutex.unlock();
+}
+
+void Voyager::receive_message() {
+    MPI_Status status;
+    Message* msg;
+    MPI_Recv( &msg, 1, Singleton::getInstance().getDataType(), MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    mutex.lock();
 
     timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
 
@@ -37,6 +54,7 @@ void Voyager::receive_message(Message *msg) {
             handle_REQUESTING_VESSEL(msg);
             break;
     }
+    mutex.unlock();
 
 }
 
@@ -102,10 +120,14 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size) {
-        if (count + 1 < COSTUME_QUANTITY && !wasDEN)
+        if (count + 1 < COSTUME_QUANTITY && !wasDEN) {
             state = static_cast<State>(get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1));  // ubieganie sie o randomowy statek
-        count = count_all = 0;
-        wasDEN = false;
+        } else {
+            count = count_all = 0;
+            wasDEN = false;
+            std::thread thread(std::ref(*&*this));  // To wygląda źle
+        }
+
     }
 }
 

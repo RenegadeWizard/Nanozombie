@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <mpi.h>
 #include "src/Voyager.h"
+#include <thread>
 
 
 int main(int argc, char* argv[]){
@@ -12,9 +13,15 @@ int main(int argc, char* argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
     auto *voyager = new Voyager(id, size);
+//    Voyager voy(id,size);
+    std::thread thread(std::ref(*voyager));
+
 
     //TODO: jakieś odczytywanie w pętli przychodzących wiadomości i wywoływanie tego niżej
-//    voyager->receive_message(msg);
+    while (true){
+        voyager->receive_message();
+//        voy.receive_message();
+    }
 
     delete voyager;
     MPI_Finalize();

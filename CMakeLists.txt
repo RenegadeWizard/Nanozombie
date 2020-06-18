@@ -4,6 +4,7 @@ project(Nanozombie)
 find_package(MPI REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS -pthread)
 
 add_executable(nanozombie
         src/nano_struct.h
