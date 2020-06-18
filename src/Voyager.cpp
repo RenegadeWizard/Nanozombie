@@ -96,18 +96,16 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             if (msg->resource == COSTUME && (msg->timestamp > timestamp || (msg->timestamp == timestamp && msg->sender_id > id))) {
                 send->msgType = DEN;
             } else {
-                send->msgType = RES;
+                send->msgType = REP;
+                send->data = 0;
             }
             break;
         case DEN:
             wasDEN = true;
             break;
         case REP:
-            count++;
-            count_all++;
-            check_VALID_COSTUME();
-            break;
-        case RES:
+            if(msg->data)
+                count++;
             count_all++;
             check_VALID_COSTUME();
             break;
@@ -129,7 +127,7 @@ void Voyager::check_VALID_COSTUME() {
         } else {
             count = count_all = 0;
             wasDEN = false;
-            std::thread thread(std::ref(*&*this));  // To wygląda źle
+            std::thread thread(std::ref(*this));
         }
 
     }
@@ -218,6 +216,7 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
                 send->msgType = DEN;
             } else if (msg->resource == COSTUME) {
                 send->msgType = REP;
+                send->data = 1;
             } else {
                 send->msgType = RES;
             }
