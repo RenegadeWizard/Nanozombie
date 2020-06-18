@@ -9,7 +9,7 @@
 //TODO: w teorii można połączyć State z Resource, jakby ustawić REQUESTING_COSTUME na początku, ale już i tak jakieś dziwne rzeczy tu się dzieją,
 // więc może lepiej nie dobijać przejrzystości
 enum State { // od 0 do VESSEL_Q-1 są żądania poszczególnych łodzi, a potem jak widać
-    START = VESSEL_QUANTITY, REQUESTING_COSTUME, HAVE_VESSEL, SIGHTSEEING
+    START = VESSEL_QUANTITY, REQUESTING_COSTUME, HAVE_VESSEL, SIGHTSEEING, WANT_DEPARTURE
 };
 
 enum MessageType { // opisane w sprawozdaniu/jakimś opisie algorytmu
@@ -32,7 +32,7 @@ struct Message {
     Message();
     Message(unsigned int timestamp, int sender, int receiver = 0);
     void send();
-    void broadcast(int voyagers);
+    void broadcast(int quantity_of_voyagers);
 };
 
 char *state_to_string(State state);

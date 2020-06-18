@@ -31,6 +31,9 @@ void Voyager::receive_message(Message *msg) {
         case SIGHTSEEING:
             handle_SIGHTSEEING(msg);
             break;
+        case WANT_DEPARTURE:
+            handle_WANT_DEPARTURE(msg);
+            break;
         default:
             handle_REQUESTING_VESSEL(msg);
             break;
@@ -118,7 +121,77 @@ void Voyager::check_VALID_COSTUME() {
 }
 
 void Voyager::handle_HAVE_VESSEL(Message *msg) {
+    auto response = Message(timestamp, id, msg->sender_id);
 
+    switch (msg->msgType) {
+
+        case REQ:
+
+            break;
+        case DEN:
+            break;
+        case REP:
+            ++count_all;
+
+            break;
+        case TIC:
+            got_TIC_for = msg->resource;
+            break;
+        case ACK:
+            break;
+        case OUT: // wypłynięcie
+            state = SIGHTSEEING;
+            //TODO: odliczanie czasu msg->data, osobny wątek
+            break;
+        case RES:
+            ++count_all;
+
+            break;
+    }
+
+    if (count_all == size - 1) {
+
+    }
+}
+
+void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawozdania, że po TIC odsyłane są DENy kiedy turysta zajmuje więcej miejsa niż jest dostępne, oraz sprawdzanie przed ACK (3.4)
+
+    switch (msg->msgType) {
+
+        case REQ:
+
+            break;
+        case DEN:
+            ++count_all;
+            break;
+        case REP:
+            break;
+        case TIC: // TODO: rozważyć, czy możliwe / czy dwa procesy mogą chcieć wypływać (lepiej żeby było pojedyńczo)
+            break;
+        case ACK:
+            ++count_all;
+            get_ACK = true;
+            break;
+        case OUT: // TODO: rozważyć, czy możliwe / czy dwa procesy mogą chcieć wypływać (lepiej żeby było pojedyńczo)
+
+            break;
+        case RES:
+            break;
+    }
+
+    if (count_all == size - 1) { // kiedy otrzyma wszystkie odpowiedzi
+
+        if (get_ACK) {
+            state = HAVE_VESSEL;
+        } else {
+            auto out = Message(timestamp, id);
+            out.msgType = OUT;
+            out.data = rng(); //TODO: uzupełnić i sprawdzić
+            out.resource;
+            out.broadcast(size);
+        }
+
+    }
 }
 
 void Voyager::handle_SIGHTSEEING(Message *msg) {

@@ -37,7 +37,11 @@ private:
 
     void handle_SIGHTSEEING(Message *msg);
 
+    Resource got_TIC_for = static_cast<Resource>(0);
     void handle_REQUESTING_VESSEL(Message *msg);
+
+    bool get_ACK = false;
+    void handle_WANT_DEPARTURE(Message *msg);
 
     void send_REQUEST_COSTUME(Message *msg);
 
