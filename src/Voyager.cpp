@@ -10,7 +10,7 @@ Voyager::Voyager(int id, int size) {
     this->id = id;
     this->size = size;
     rng.seed(time(nullptr));
-    logger("Zaczynamy");
+    logger(false, "Zaczynamy");
     //TODO: rozpoczęcie czekania losowego czasu, a potem ubiegania się o kostium
     send_REQUEST_COSTUME(new Message());    // TODO
 }
@@ -44,6 +44,25 @@ void Voyager::send_message(Message *msg) {
 }
 
 void Voyager::handle_START(Message *msg) {
+
+    switch (msg->msgType) {
+
+        case REQ:
+            break;
+        case DEN:
+        case REP: //
+            break;
+        case TIC:
+            break;
+        case ACK:
+            break;
+        case OUT:
+            break;
+        case RES:
+            break;
+        default:
+            break;
+    }
 
 }
 
@@ -79,7 +98,8 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             send->msgType = DEN;
             break;
         default:
-            printf("To sie nie powinno było wydarzyć (handle_REQUESTING_COSTUME -> default w switch dostał wiadomość: %d)", msg->msgType);
+//            printf("To sie nie powinno było wydarzyć (handle_REQUESTING_COSTUME -> default w switch dostał wiadomość: %d)", msg->msgType);
+            logger(true, "To sie nie powinno było wydarzyć", msg->msgType);
             break;
     }
 //    send_message(send);
@@ -117,28 +137,34 @@ int Voyager::get_RANDOM_NUMBER(int a, int b) {
     return dist6(rng);
 }
 
-void Voyager::logger(char *msg) {
-    char text_state[50];
-    switch (state) {
+void Voyager::logger(bool error, const std::string &msg) {
+    char *text_state = state_to_string(state);
 
-        case START:
-            sprintf(text_state, "Odpoczywam...");
-            break;
-        case REQUESTING_COSTUME:
-            sprintf(text_state, "Domagam się kostiumu...");
-            break;
-        case HAVE_VESSEL:
-            sprintf(text_state, "Czekam na wypłynięcie statku...");
-            break;
-        case SIGHTSEEING:
-            sprintf(text_state, "Zwiedzam...");
-            break;
-        default:
-            sprintf(text_state, "Domagam się statku numer %d...", state);
-            break;
+
+    if (error) {
+        char err[200];
+        sprintf(err, "[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s", id, 0, 0, text_state, msg.c_str());
+        perror(err);
+    } else {
+        printf("[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s\n", id, 0, 0, text_state, msg.c_str()); //TODO: zamienić 0'a na informacje o posiadaniu kostiumu i numerze statku
+    }
+    delete[] text_state;
+}
+
+std::string msgType_to_string[7] = {"REQ", "DEN", "REP", "TIC", "ACK", "OUT", "RES"}; // pewnie nie najpiękniejsze rozwiązanie
+
+void Voyager::logger(bool error, const std::string &msg, MessageType msgType) {
+    char *text_state = state_to_string(state);
+
+    if (error) {
+        char err[250];
+        sprintf(err, "[%d]\tKostium: %d | Statek: %d | %s | Otrzymana wiadomość: %s\n\t\t%s", id, 0, 0, text_state, msgType_to_string[msgType].c_str(), msg.c_str());
+        perror(err);
+    } else {
+        printf("[%d]\tKostium: %d | Statek: %d | %s | Otrzymana wiadomość: %s\n\t\t%s\n", id, 0, 0, text_state, msgType_to_string[msgType].c_str(), msg.c_str()); //TODO: zamienić 0'a na informacje o posiadaniu kostiumu i numerze statku
     }
 
-
-    printf("[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s\n", id, 0, 0, text_state, msg); //TODO: zamienić 0'a na informacje o posiadaniu kostiumu i numerze statku
+    delete[] text_state;
 }
+
 

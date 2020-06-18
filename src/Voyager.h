@@ -43,7 +43,11 @@ private:
 
     int get_RANDOM_NUMBER(int, int);
 
-    void logger(char *msg);
+//    static char *state_to_string(State state);
+
+    void logger(bool error, const std::string& msg);
+
+    void logger(bool error, const std::string& msg, MessageType msgType);
 
 };
 

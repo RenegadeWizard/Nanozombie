@@ -1,6 +1,8 @@
 #ifndef NANO_STRUCT
 #define NANO_STRUCT
 
+#include <string>
+
 #define VESSEL_QUANTITY 10
 #define COSTUME_QUANTITY 15
 
@@ -32,5 +34,7 @@ struct Message {
     void send();
     void broadcast(int voyagers);
 };
+
+char *state_to_string(State state);
 
 #endif
