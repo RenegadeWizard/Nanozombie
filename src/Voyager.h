@@ -16,14 +16,13 @@ public:
 
     void receive_message(Message *msg);
 
-    void send_message(Message *msg); // pozwoliłem przenieść sobie tą użyteczność do samego Message, (bo jestem upośledzony i wolę robić wzsytsko tylko nie zajmowac się normalną robotą), w razie czego wszystko wrócę do sanu poprzedniego
-
 private:
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
+    bool wasDEN = false;
 //    State state = START;
     std::mt19937 rng;
 
@@ -38,8 +37,6 @@ private:
     void handle_SIGHTSEEING(Message *msg);
 
     void handle_REQUESTING_VESSEL(Message *msg);
-
-    void send_REQUEST_COSTUME(Message *msg);
 
     void check_VALID_COSTUME();
 
