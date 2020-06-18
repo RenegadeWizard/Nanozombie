@@ -13,7 +13,7 @@
 #include <mutex>
 #include <chrono>
 
-class Voyager : private Logger{
+class Voyager : private Logger {
 public:
     Voyager(int id, int size);
 
@@ -45,19 +45,14 @@ private:
     void handle_SIGHTSEEING(Message *msg);
 
     Resource got_TIC_for = static_cast<Resource>(0);
+
     void handle_REQUESTING_VESSEL(Message *msg);
 
-    bool get_ACK = false;
+    bool got_ACK = false;
+
     void handle_WANT_DEPARTURE(Message *msg);
 
     void check_VALID_COSTUME();
-
-public:
-    int getId() const;
-
-    State getState() const;
-
-private:
 
     int get_RANDOM_NUMBER(int, int);
 

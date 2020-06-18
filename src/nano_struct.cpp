@@ -19,7 +19,9 @@ void Singleton::create_custom_message_type() {
     offsets[5] = offsetof(struct Message, msgType);
     offsets[6] = offsetof(struct Message, resource);
 
-    MPI_Type_create_struct(7, blocklengths, offsets, types, &mpi_message_type);
+    if(MPI_Type_create_struct(7, blocklengths, offsets, types, &mpi_message_type)!=MPI_SUCCESS){
+        perror("nie dobrze");
+    }
     MPI_Type_commit(&mpi_message_type);
 }
 

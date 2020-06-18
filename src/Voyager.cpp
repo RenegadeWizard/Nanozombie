@@ -31,8 +31,8 @@ void Voyager::wait_FOR_COSTUME() {
 
 void Voyager::receive_message() {
     MPI_Status status;
-    Message* msg;
-    MPI_Recv( &msg, 1, Singleton::getInstance().getDataType(), MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    auto msg = new Message();
+    MPI_Recv(msg, 1, Singleton::getInstance().getDataType(), MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
     mutex.lock();
 
     timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
@@ -59,6 +59,7 @@ void Voyager::receive_message() {
     }
     mutex.unlock();
 
+    delete msg;
 }
 
 void Voyager::handle_START(Message *msg) {
@@ -149,6 +150,7 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
 
             break;
         case TIC:
+//            if(msg->resource)
             got_TIC_for = msg->resource;
             break;
         case ACK:
@@ -184,7 +186,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawoz
             break;
         case ACK:
             ++count_all;
-            get_ACK = true;
+            got_ACK = true;
             break;
         case OUT: // TODO: rozważyć, czy możliwe / czy dwa procesy mogą chcieć wypływać (lepiej żeby było pojedyńczo)
 
@@ -195,12 +197,12 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawoz
 
     if (count_all == size - 1) { // kiedy otrzyma wszystkie odpowiedzi
 
-        if (get_ACK) {
+        if (got_ACK) {
             state = HAVE_VESSEL;
         } else {
             auto out = Message(timestamp, id);
             out.msgType = OUT;
-            out.data = rng(); //TODO: uzupełnić i sprawdzić
+            out.data = get_RANDOM_NUMBER(10000, 60000); //TODO: uzupełnić i sprawdzić
             out.resource;
             out.broadcast(size);
         }
@@ -212,9 +214,9 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
     auto *send = new Message(timestamp, id, msg->sender_id);
     switch (msg->msgType) {
         case REQ:
-            if(msg->resource == (Resource)state){
+            if (msg->resource == (Resource) state) {
                 send->msgType = DEN;
-            } else if(msg->resource == COSTUME){
+            } else if (msg->resource == COSTUME) {
                 send->msgType = REP;
             } else {
                 send->msgType = RES;
@@ -239,13 +241,4 @@ int Voyager::get_RANDOM_NUMBER(int a, int b) {
     std::uniform_int_distribution<std::mt19937::result_type> dist_ab(a, b);
     return dist_ab(rng);
 }
-
-int Voyager::getId() const {
-    return id;
-}
-
-State Voyager::getState() const {
-    return state;
-}
-
 
