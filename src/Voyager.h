@@ -6,23 +6,25 @@
 #define NANOZOMBIE_VOYAGER_H
 
 #include "nano_struct.h"
+#include "Logger.h"
 #include <random>
 #include <ctime>
 
-class Voyager {
+class Voyager : private Logger{
 public:
     Voyager(int id, int size);
 
     void receive_message(Message *msg);
+
     void send_message(Message *msg); // pozwoliłem przenieść sobie tą użyteczność do samego Message, (bo jestem upośledzony i wolę robić wzsytsko tylko nie zajmowac się normalną robotą), w razie czego wszystko wrócę do sanu poprzedniego
 
 private:
-    int id; // id procesu w którym wykonywany jest kod
+//    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
-    State state = START;
+//    State state = START;
     std::mt19937 rng;
 
     // trochę pospamowałem tymi funkcjiami (do obsługi poszczególnych typów wiadomości), ale zdaje mi się, że tak będzie bardziej przejrzyście
@@ -41,13 +43,14 @@ private:
 
     void check_VALID_COSTUME();
 
+public:
+    int getId() const;
+
+    State getState() const;
+
+private:
+
     int get_RANDOM_NUMBER(int, int);
-
-//    static char *state_to_string(State state);
-
-    void logger(bool error, const std::string& msg);
-
-    void logger(bool error, const std::string& msg, MessageType msgType);
 
 };
 

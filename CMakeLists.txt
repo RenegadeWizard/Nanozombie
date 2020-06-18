@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(nanozombie
         src/nano_struct.h
-        nanozombie.cpp src/Voyager.cpp src/Voyager.h src/nano_struct.cpp)
+        nanozombie.cpp src/Voyager.cpp src/Voyager.h src/nano_struct.cpp src/Logger.cpp src/Logger.h)
 
 target_link_libraries(nanozombie ${MPI_LIBRARIES})
 

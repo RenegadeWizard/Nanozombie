@@ -25,9 +25,9 @@ struct Message {
     int receiver_id;
     int info_type;
     unsigned int timestamp;
-    int data;
+    int data; // zacząłem używać tego jako ilość zasobów
     MessageType msgType;
-    Resource resource;
+    Resource resource; // w odpowiedziach zdaje się opcjonalne
 
     Message();
     Message(unsigned int timestamp, int sender, int receiver = 0);
