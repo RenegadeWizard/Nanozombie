@@ -28,6 +28,8 @@ public:
 protected:
     int id;
     State state;
+    Resource costume = static_cast<Resource>(-1);
+    Resource vessel = static_cast<Resource>(-1);
 
 private:
 

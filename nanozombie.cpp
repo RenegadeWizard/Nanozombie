@@ -16,8 +16,6 @@ int main(int argc, char* argv[]){
 //    Voyager voy(id,size);
     std::thread thread(std::ref(*voyager));
 
-
-    //TODO: jakieś odczytywanie w pętli przychodzących wiadomości i wywoływanie tego niżej
     while (true){
         voyager->receive_message();
 //        voy.receive_message();

@@ -22,8 +22,10 @@ public:
     void operator()();
 
 private:
+    constexpr static const int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
+    int volume; // ile zajmuje dany turysta TODO: wymyślić jak to ustawiać (może losować)
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
@@ -32,8 +34,7 @@ private:
     std::mt19937 rng;
     std::mutex mutex;
 
-    // trochę pospamowałem tymi funkcjiami (do obsługi poszczególnych typów wiadomości), ale zdaje mi się, że tak będzie bardziej przejrzyście
-    // bo jak się nagle pojawi switch w switch to cała przejrzystość pójdzie w las, możliwe, że niektóre przypadki będą na tyle łatwe, że się usunie taką metodę
+
     void handle_START(Message *msg);
 
     void wait_FOR_COSTUME();
@@ -44,7 +45,7 @@ private:
 
     void handle_SIGHTSEEING(Message *msg);
 
-    Resource got_TIC_for = static_cast<Resource>(0);
+    Resource got_TIC_for = static_cast<Resource>(-1);
 
     void handle_REQUESTING_VESSEL(Message *msg);
 
@@ -55,6 +56,8 @@ private:
     void check_VALID_COSTUME();
 
     int get_RANDOM_NUMBER(int, int);
+
+    void resources_on_REQ(Message *response, Message *msg);
 
 };
 

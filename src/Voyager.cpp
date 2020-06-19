@@ -33,6 +33,7 @@ void Voyager::receive_message() {
     MPI_Status status;
     auto msg = new Message();
     MPI_Recv(msg, 1, Singleton::getInstance().getDataType(), MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    i("przed", msg);
     mutex.lock();
 
     timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
@@ -59,6 +60,7 @@ void Voyager::receive_message() {
     }
     mutex.unlock();
 
+//    i("po");
     delete msg;
 }
 
@@ -70,7 +72,6 @@ void Voyager::handle_START(Message *msg) {
         case DEN:
         case REP: //
         case ACK:
-        case RES:
             e("To nie powinno sie wydarzyć", msg);
             break;
         case TIC:
@@ -79,9 +80,8 @@ void Voyager::handle_START(Message *msg) {
             break;
         case OUT: // nie robi nic
             break;
-        case REQ: // TODO: opcjonalnie jakieś sprawdzenie, czy zasoby faktycznie są puste
-            response.msgType = RES;
-            response.data = 0;
+        case REQ:
+            resources_on_REQ(&response, msg);
             response.send();
             break;
     }
@@ -104,7 +104,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             wasDEN = true;
             break;
         case REP:
-            if(msg->data)
+            if (msg->data)
                 count++;
             count_all++;
             check_VALID_COSTUME();
@@ -116,14 +116,20 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             e("To sie nie powinno było wydarzyć", msg);
             break;
     }
-    send->send();
+    send->send(); // TODO: możliwe, że nie po każdym przypadku będzie wysyłanie, a przynajmniej mam
     delete send;
 }
 
 void Voyager::check_VALID_COSTUME() {
-    if (count_all == size) {
+    if (count_all == size - 1) {
         if (count + 1 < COSTUME_QUANTITY && !wasDEN) {
             state = static_cast<State>(get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1));  // ubieganie sie o randomowy statek
+            costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
+
+            auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
+            msg.msgType = REQ;
+            msg.resource = static_cast<Resource>(state);
+            msg.broadcast(size);
         } else {
             count = count_all = 0;
             wasDEN = false;
@@ -139,57 +145,57 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
     switch (msg->msgType) {
 
         case REQ:
-
+            resources_on_REQ(&response, msg);
+            response.send();
             break;
         case DEN:
-            break;
         case REP:
-            ++count_all;
-
+        case ACK:
+            e("Nie powinno się zdarzyć", msg);
             break;
         case TIC:
-//            if(msg->resource)
-            got_TIC_for = msg->resource;
-            break;
-        case ACK:
+            response.msgType = DEN;
+            response.send();
             break;
         case OUT: // wypłynięcie
-            state = SIGHTSEEING;
-            //TODO: odliczanie czasu msg->data, osobny wątek
+            if (msg->resource == vessel) {
+                state = SIGHTSEEING;
+                //TODO: odliczanie czasu msg->data, osobny wątek
+            }
             break;
-        case RES:
-            ++count_all;
 
-            break;
     }
 
-    if (count_all == size - 1) {
-
-    }
 }
 
-void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawozdania, że po TIC odsyłane są DENy kiedy turysta zajmuje więcej miejsa niż jest dostępne, oraz sprawdzanie przed ACK (3.4)
+void Voyager::handle_WANT_DEPARTURE(Message *msg) { // TODO: rozważyć usunięcie założenia o maksymalnym czasie transmisji (być może poprzez rozwinięcie structury o State state_in_request)
+    auto response = Message();
 
     switch (msg->msgType) {
 
         case REQ:
-
+            resources_on_REQ(&response, msg);
+            response.send();
             break;
         case DEN:
             ++count_all;
             break;
         case REP:
+            e("Nie powinno się zdarzyć", msg);
             break;
-        case TIC: // TODO: rozważyć, czy możliwe / czy dwa procesy mogą chcieć wypływać (lepiej żeby było pojedyńczo)
+        case TIC:
+            response.msgType = DEN;
+            response.send();
             break;
         case ACK:
             ++count_all;
             got_ACK = true;
             break;
-        case OUT: // TODO: rozważyć, czy możliwe / czy dwa procesy mogą chcieć wypływać (lepiej żeby było pojedyńczo)
-
-            break;
-        case RES:
+        case OUT:
+            if (msg->resource == vessel) {
+                state = SIGHTSEEING;
+                //TODO: odliczanie czasu msg->data, osobny wątek
+            }
             break;
     }
 
@@ -197,11 +203,13 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) { //TODO!!!: dodać do sprawoz
 
         if (got_ACK) {
             state = HAVE_VESSEL;
+            count_all = 0;
+            count = 0;
         } else {
             auto out = Message(timestamp, id);
             out.msgType = OUT;
-            out.data = get_RANDOM_NUMBER(10000, 60000); //TODO: uzupełnić i sprawdzić
-            out.resource;
+            out.data = get_RANDOM_NUMBER(10000, 60000);
+            out.resource = vessel;
             out.broadcast(size);
         }
 
@@ -218,12 +226,17 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
                 send->msgType = REP;
                 send->data = 1;
             } else {
-                send->msgType = RES;
+                send->msgType = REP;
             }
             break;
         case TIC:
             send->msgType = DEN;
             break;
+        case OUT: // uznałem, że może się zdarzyć, że dwa lub więcej może się ubiegać o wpłynięcie, a skoro już wypłyneli to ignoruje to
+        case DEN:
+        case ACK:
+            delete send;
+            return;
         default:
             e("To sie nie powinno było wydarzyć", msg);
             break;
@@ -239,5 +252,14 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 int Voyager::get_RANDOM_NUMBER(int a, int b) {
     std::uniform_int_distribution<std::mt19937::result_type> dist_ab(a, b);
     return dist_ab(rng);
+}
+
+void Voyager::resources_on_REQ(Message *response, Message *msg) {
+    response->msgType = REP;
+    if (msg->resource == COSTUME) {
+        response->data = (COSTUME == costume) ? 1 : 0;
+    } else {
+        response->data = (msg->resource == vessel) ? volume : 0;
+    }
 }
 

@@ -11,10 +11,10 @@ void Logger::logger(bool error, const std::string &msg) {
 
     if (error) {
         char err[200];
-        sprintf(err, "[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s", id, 0, 0, text_state, msg.c_str());
+        sprintf(err, "[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s", id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msg.c_str());
         perror(err);
     } else {
-        printf("[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s\n", id, 0, 0, text_state, msg.c_str()); //TODO: zamienić 0'a na informacje o posiadaniu kostiumu i numerze statku
+        printf("[%d]\tKostium: %d | Statek: %d | %s\n\t\t%s\n", id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msg.c_str());
     }
     delete[] text_state;
 }
@@ -25,11 +25,11 @@ void Logger::logger(bool error, const std::string &msg, Message *data) {
     if (error) {
         char err[250];
         sprintf(err, "[%d]\tKostium: %d | Statek: %d | %s | Otrzymana wiadomość: %s od %d\n\t\t%s",
-                id, 0, 0, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str());
+                id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str());
         perror(err);
     } else {
         printf("[%d]\tKostium: %d | Statek: %d | %s | Otrzymana wiadomość: %s od %d\n\t\t%s\n",
-               id, 0, 0, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str()); //TODO: zamienić 0'a na informacje o posiadaniu kostiumu i numerze statku
+               id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str());
     }
 
     delete[] text_state;
