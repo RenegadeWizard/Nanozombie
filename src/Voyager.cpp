@@ -10,8 +10,8 @@
 Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
     got_TIC_for = new std::vector<Message>();
-    rng.seed(time(nullptr));
     volume = get_RANDOM_NUMBER(1, MAX_VOYAGER_VOLUME); // losowanie ile miejsca zajmuje dany turysta
+    rng.seed(time(nullptr) ^ (id<<16));
     i("Zaczynamy");
 }
 
@@ -19,7 +19,7 @@ void Voyager::operator()() {
     wait_FOR_COSTUME();
 }
 
-void Voyager::wait_FOR_COSTUME() {
+void Voyager::wait_FOR_COSTUME() {  // TODO: wysyłaj z poprzednim timestamp'em
     std::this_thread::sleep_for(std::chrono::milliseconds(get_RANDOM_NUMBER(500, 5000)));
     mutex.lock();
     state = REQUESTING_COSTUME;
@@ -105,39 +105,37 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
                 send->msgType = REP;
                 send->data = 0;
             }
+            send->send();
             break;
         case DEN:
             wasDEN = true;
             break;
         case REP:
-            if (msg->data)
-                count++;
+            count += msg->data;
             count_all++;
             check_VALID_COSTUME();
             break;
         case TIC:
             send->msgType = DEN;
+            send->send();
             break;
         default:
             e("To sie nie powinno było wydarzyć", msg);
             break;
     }
-    send->send(); // TODO: możliwe, że nie po każdym przypadku będzie wysyłanie, a przynajmniej mam
     delete send;
 }
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-        if (count + 1 < COSTUME_QUANTITY && !wasDEN) {
             costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
             sent_timestamp = -1;
             start_REQUESTING_VESSEL();
         } else {
-            count = count_all = 0;
-            wasDEN = false;
             std::thread thread(std::ref(*this));
         }
-
+        count = count_all = 0;
+        wasDEN = false;
     }
 }
 
@@ -314,7 +312,8 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 }
 
 void Voyager::start_REQUESTING_VESSEL() {
-    state = static_cast<State>(get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1));  // ubieganie sie o randomowy statek
+    int rand = get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1);
+    state = static_cast<State>(rand);  // ubieganie sie o randomowy statek
 
     auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
     if (sent_timestamp == -1) {
