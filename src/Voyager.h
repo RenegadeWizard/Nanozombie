@@ -18,6 +18,8 @@ class Voyager : private Logger {
 public:
     Voyager(int id, int size);
 
+    virtual ~Voyager();
+
     void receive_message();
 
     void operator()();
@@ -48,10 +50,6 @@ private:
     void handle_SIGHTSEEING(Message *msg);
 
     std::vector<Message> *got_TIC_for;
-public:
-    virtual ~Voyager();
-
-private:
 
     void handle_REQUESTING_VESSEL(Message *msg);
 
@@ -61,11 +59,15 @@ private:
 
     void start_REQUESTING_VESSEL();
 
+    void start_REQUESTING_VESSEL(Resource resource);
+
     void check_VALID_COSTUME();
 
     int get_RANDOM_NUMBER(int, int);
 
     void resources_on_REQ(Message *response, Message *msg);
+
+    void start_SIGHTSEEING(int time);
 
     void sightseeing(int time);
 

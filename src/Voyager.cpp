@@ -11,7 +11,7 @@ Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
     got_TIC_for = new std::vector<Message>();
     volume = get_RANDOM_NUMBER(1, MAX_VOYAGER_VOLUME); // losowanie ile miejsca zajmuje dany turysta
-    rng.seed(time(nullptr) ^ (id<<16));
+    rng.seed(time(nullptr) ^ (id << 16));
     i("Zaczynamy");
 }
 
@@ -128,14 +128,15 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-            costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
-            sent_timestamp = -1;
-            start_REQUESTING_VESSEL();
-        } else {
-            std::thread thread(std::ref(*this));
-        }
         count = count_all = 0;
         wasDEN = false;
+        costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
+        sent_timestamp = -1;
+        start_REQUESTING_VESSEL();
+    } else {
+        count = count_all = 0;
+        wasDEN = false;
+        std::thread thread(std::ref(*this));
     }
 }
 
@@ -159,8 +160,7 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
             break;
         case OUT: // wypłynięcie
             if (msg->resource == vessel) {
-                state = SIGHTSEEING;
-                std::thread thread(&Voyager::sightseeing, this, msg->data);
+                start_SIGHTSEEING(msg->data);
             }
             break;
 
@@ -194,8 +194,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             break;
         case OUT:
             if (msg->resource == vessel) {
-                state = SIGHTSEEING;
-                std::thread thread(&Voyager::sightseeing, this, msg->data);
+                start_SIGHTSEEING(msg->data);
             }
             break;
     }
@@ -293,14 +292,44 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
     }
 
     if (count_all == size - 1) {
-        if (!wasDEN && count + volume <= vessel_capacity[state]) {
+        if (!wasDEN && count + volume <= vessel_capacity[state]) { // uzyskanie statku
+            vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
-            if (!got_TIC_for->empty()) {
-
+            if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
+                Message den(timestamp, id);
+                den.msgType = DEN;
+                for (auto m: *got_TIC_for) {
+                    den.receiver_id = m.sender_id;
+                    den.send();
+                }
             }
-        } else {
+            if (vessel_capacity[vessel] == count + volume) { // sprawdzanie czy pełen
+                response.msgType = OUT;
+                response.resource = vessel;
+                response.data = get_RANDOM_NUMBER(10000, 60000);
+                response.broadcast(size);
+                start_SIGHTSEEING(response.data);
+            } else if (vessel_capacity[vessel] - (count + volume) <= MAX_VOYAGER_VOLUME) { // sprawdzanie czy WANT_DEPARTURE
+                response.msgType = TIC;
+                response.data = count + volume;
+                response.resource = vessel;
+                response.broadcast(size);
+                state = WANT_DEPARTURE;
+            }
+        } else { // nie uzyskanie miejsca w statku
             if (!got_TIC_for->empty()) {
-
+                if(got_TIC_for->size() > 1){ // odmowy dla innych niż pierwszy
+                    Message den(timestamp, id);
+                    den.msgType = DEN;
+                    for (int i = 1; i < got_TIC_for->size(); ++i) {
+                        den.receiver_id = got_TIC_for->at(i).sender_id;
+                        den.send();
+                    }
+                }
+                response.msgType = ACK;
+                response.receiver_id = got_TIC_for->at(0).sender_id;
+                response.send();
+                start_REQUESTING_VESSEL(got_TIC_for->at(0).resource);
             } else {
                 start_REQUESTING_VESSEL();
             }
@@ -314,6 +343,18 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 void Voyager::start_REQUESTING_VESSEL() {
     int rand = get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1);
     state = static_cast<State>(rand);  // ubieganie sie o randomowy statek
+
+    auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
+    if (sent_timestamp == -1) {
+        sent_timestamp = (int) timestamp;
+    }
+    msg.msgType = REQ;
+    msg.resource = static_cast<Resource>(state);
+    msg.broadcast(size);
+}
+
+void Voyager::start_REQUESTING_VESSEL(Resource resource) {
+    state = static_cast<State>(resource);
 
     auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
     if (sent_timestamp == -1) {
@@ -348,6 +389,11 @@ void Voyager::sightseeing(int time) {
     count_all = 0;
     mutex.unlock();
     wait_FOR_COSTUME();
+}
+
+void Voyager::start_SIGHTSEEING(int time) {
+    state = SIGHTSEEING;
+    std::thread thread(&Voyager::sightseeing, this, time);
 }
 
 Voyager::~Voyager() {
