@@ -160,7 +160,7 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
         case OUT: // wypłynięcie
             if (msg->resource == vessel) {
                 state = SIGHTSEEING;
-                //TODO: odliczanie czasu msg->data, osobny wątek
+                std::thread thread(&Voyager::sightseeing, this, msg->data);
             }
             break;
 
@@ -194,7 +194,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) { // TODO: rozważyć usunięc
         case OUT:
             if (msg->resource == vessel) {
                 state = SIGHTSEEING;
-                //TODO: odliczanie czasu msg->data, osobny wątek
+                std::thread thread(&Voyager::sightseeing, this, msg->data);
             }
             break;
     }
@@ -261,5 +261,17 @@ void Voyager::resources_on_REQ(Message *response, Message *msg) {
     } else {
         response->data = (msg->resource == vessel) ? volume : 0;
     }
+}
+
+void Voyager::sightseeing(int time) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(time));
+    mutex.lock();
+    state = START;
+    costume = static_cast<Resource>(-1);
+    vessel = static_cast<Resource>(-1);
+    count = 0;
+    count_all = 0;
+    mutex.unlock();
+    wait_FOR_COSTUME();
 }
 

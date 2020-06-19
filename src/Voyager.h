@@ -59,6 +59,8 @@ private:
 
     void resources_on_REQ(Message *response, Message *msg);
 
+    void sightseeing(int time);
+
 };
 
 
