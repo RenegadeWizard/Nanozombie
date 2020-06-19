@@ -55,6 +55,15 @@ void Message::broadcast(int voyagers) {
     }
 }
 
+Message::Message(Message *message) {
+    sender_id = message->sender_id;
+    receiver_id = message->receiver_id;
+    timestamp = message->timestamp;
+    data = message->data;
+    msgType = message->msgType;
+    resource = message->resource;
+}
+
 Message::Message() = default;
 
 char *state_to_string(State state) {

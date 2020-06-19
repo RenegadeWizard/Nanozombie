@@ -33,6 +33,8 @@ struct Message {
 
     Message();
 
+    Message(Message *message);
+
     Message(unsigned int timestamp, int sender, int receiver = 0);
 
     void send();

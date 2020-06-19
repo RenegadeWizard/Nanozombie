@@ -12,6 +12,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <vector>
 
 class Voyager : private Logger {
 public:
@@ -29,6 +30,7 @@ private:
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
+    int sent_timestamp = -1;
     bool wasDEN = false;
 //    State state = START;
     std::mt19937 rng;
@@ -45,13 +47,19 @@ private:
 
     void handle_SIGHTSEEING(Message *msg);
 
-    Resource got_TIC_for = static_cast<Resource>(-1);
+    std::vector<Message> *got_TIC_for;
+public:
+    virtual ~Voyager();
+
+private:
 
     void handle_REQUESTING_VESSEL(Message *msg);
 
     bool got_ACK = false;
 
     void handle_WANT_DEPARTURE(Message *msg);
+
+    void start_REQUESTING_VESSEL();
 
     void check_VALID_COSTUME();
 
