@@ -10,6 +10,7 @@
 Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
     rng.seed(time(nullptr));
+    volume = get_RANDOM_NUMBER(1, MAX_VOYAGER_VOLUME); // losowanie ile miejsca zajmuje dany turysta
     i("Zaczynamy");
 }
 

@@ -25,7 +25,7 @@ private:
     constexpr static const int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
-    int volume; // ile zajmuje dany turysta TODO: wymyślić jak to ustawiać (może losować)
+    int volume; // ile zajmuje dany turysta
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
