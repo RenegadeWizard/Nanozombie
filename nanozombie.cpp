@@ -14,6 +14,7 @@ int main(int argc, char* argv[]){
 
     auto *voyager = new Voyager(id, size);
     std::thread thread(std::ref(*voyager));
+    thread.detach();
 
     while (true){
         voyager->receive_message();

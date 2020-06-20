@@ -134,6 +134,7 @@ void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
         if(wasDEN && count+1 <= COSTUME_QUANTITY){
             std::thread thread(std::ref(*this));
+            thread.detach();
         } else{
             costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
             sent_timestamp = -1;
@@ -424,6 +425,7 @@ void Voyager::start_SIGHTSEEING(int time) {
     state = SIGHTSEEING;
     i("Zaczynam zwiedzać!");
     std::thread thread(&Voyager::sightseeing, this, time);
+    thread.detach();
 }
 
 Voyager::~Voyager() {
