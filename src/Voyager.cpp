@@ -23,6 +23,7 @@ void Voyager::wait_FOR_COSTUME() {  // TODO: wysyłaj z poprzednim timestamp'em
     std::this_thread::sleep_for(std::chrono::milliseconds(get_RANDOM_NUMBER(500, 5000)));
     mutex.lock();
     state = REQUESTING_COSTUME;
+    i("Zaczynam domagać się kostiumu!");
     auto send = new Message((sent_timestamp != -1) ? (unsigned int) sent_timestamp : timestamp, id, 0);
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
@@ -192,6 +193,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             break;
         case TIC:
             response.msgType = NOPE;
+            response.receiver_id = msg->sender_id;
             response.send();
             break;
         case ACK:
@@ -217,6 +219,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             out.data = get_RANDOM_NUMBER(10000, 60000);
             out.resource = vessel;
             out.broadcast(size);
+            start_SIGHTSEEING(out.data);
         }
 
     }
@@ -365,6 +368,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 void Voyager::start_REQUESTING_VESSEL() {
     int rand = get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1);
     state = static_cast<State>(rand);  // ubieganie sie o randomowy statek
+    i("Zaczynam domagać się statku!");
 
     auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
     if (sent_timestamp == -1) {
@@ -377,6 +381,7 @@ void Voyager::start_REQUESTING_VESSEL() {
 
 void Voyager::start_REQUESTING_VESSEL(Resource resource) {
     state = static_cast<State>(resource);
+    i("Zaczynam domagać się statku!");
 
     auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
     if (sent_timestamp == -1) {
@@ -394,6 +399,7 @@ int Voyager::get_RANDOM_NUMBER(int a, int b) {
 
 void Voyager::resources_on_REQ(Message *response, Message *msg) {
     response->msgType = REP;
+    response->receiver_id = msg->sender_id;
     if (msg->resource == COSTUME) {
         response->data = (COSTUME == costume) ? 1 : 0;
     } else {
@@ -405,6 +411,7 @@ void Voyager::sightseeing(int time) {
     std::this_thread::sleep_for(std::chrono::milliseconds(time));
     mutex.lock();
     state = START;
+    i("Zaczynam odpoczywać!");
     costume = static_cast<Resource>(-1);
     vessel = static_cast<Resource>(-1);
     count = 0;
@@ -420,5 +427,6 @@ void Voyager::start_SIGHTSEEING(int time) {
 }
 
 Voyager::~Voyager() {
+    i("!!!!!!!!Zabiłem się!!!!!!!");
     delete got_TIC_for;
 }
