@@ -15,7 +15,7 @@ enum State : int { // od 0 do VESSEL_Q-1 są żądania poszczególnych łodzi, a
 };
 
 enum MessageType : int { // opisane w sprawozdaniu/jakimś opisie algorytmu
-    REQ, DEN, REP, TIC, ACK, OUT
+    REQ, DEN, REP, TIC, ACK, OUT, NOPE
 };
 
 enum Resource : int { // od 0 do VESSEL_Q-1 są to łodzie, a potem kostium

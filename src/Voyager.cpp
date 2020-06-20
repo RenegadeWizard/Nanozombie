@@ -80,10 +80,11 @@ void Voyager::handle_START(Message *msg) {
             e("To nie powinno sie wydarzyć", msg);
             break;
         case TIC:
-            response.msgType = DEN;
+            response.msgType = NOPE;
             response.send();
             break;
         case OUT: // nie robi nic
+        case NOPE:
             break;
         case REQ:
             resources_on_REQ(&response, msg);
@@ -116,8 +117,10 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             check_VALID_COSTUME();
             break;
         case TIC:
-            send->msgType = DEN;
+            send->msgType = NOPE;
             send->send();
+            break;
+        case NOPE: // ignorujemy
             break;
         default:
             e("To sie nie powinno było wydarzyć", msg);
@@ -152,10 +155,11 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
         case DEN:
         case REP:
         case ACK:
+        case NOPE:
             e("Nie powinno się zdarzyć", msg);
             break;
         case TIC:
-            response.msgType = DEN;
+            response.msgType = NOPE;
             response.send();
             break;
         case OUT: // wypłynięcie
@@ -178,14 +182,15 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             resources_on_REQ(&response, msg);
             response.send();
             break;
-        case DEN:
+        case NOPE:
             ++count_all;
             break;
         case REP:
+        case DEN:
             e("Nie powinno się zdarzyć", msg);
             break;
         case TIC:
-            response.msgType = DEN;
+            response.msgType = NOPE;
             response.send();
             break;
         case ACK:
@@ -230,10 +235,10 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
             }
             break;
         case TIC:
-            send->msgType = DEN;
+            send->msgType = NOPE;
             break;
         case OUT: // uznałem, że może się zdarzyć, że dwa lub więcej może się ubiegać o wpłynięcie, a skoro już wypłyneli to ignoruje to
-        case DEN:
+        case NOPE:
         case ACK:
             delete send;
             return;
@@ -273,7 +278,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             break;
         case TIC:
             if (volume > vessel_capacity[msg->resource] - msg->data) {
-                response.msgType = DEN;
+                response.msgType = NOPE;
                 response.send();
             } else {
                 if (msg->resource == static_cast<Resource>(state)) {
@@ -285,6 +290,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             }
             break;
         case ACK:
+        case NOPE:
             e("nie powinno wystąpić", msg);
             break;
         case OUT: // ignoruje
@@ -297,7 +303,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             state = HAVE_VESSEL;
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
-                den.msgType = DEN;
+                den.msgType = NOPE;
                 for (auto m: *got_TIC_for) {
                     den.receiver_id = m.sender_id;
                     den.send();
@@ -330,7 +336,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                     }
 
                     Message den(timestamp, id);
-                    den.msgType = DEN;
+                    den.msgType = NOPE;
                     for (size_t i = 1; i < got_TIC_for->size(); ++i) {
                         if (i != (size_t) mi) {
                             den.receiver_id = got_TIC_for->at(i).sender_id;
