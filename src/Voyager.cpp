@@ -24,7 +24,8 @@ void Voyager::wait_FOR_COSTUME() {  // TODO: wysyłaj z poprzednim timestamp'em
     mutex.lock();
     state = REQUESTING_COSTUME;
     i("Zaczynam domagać się kostiumu!");
-    auto send = new Message((sent_timestamp != -1) ? (unsigned int) sent_timestamp : timestamp, id, 0);
+    auto send = new Message(timestamp, id, 0);
+    send->timestamp = (sent_timestamp != -1) ? (unsigned int) sent_timestamp : timestamp;
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
@@ -42,7 +43,7 @@ void Voyager::receive_message() {
     i("przed", msg);
     mutex.lock();
 
-    timestamp = std::max(timestamp, msg->timestamp) + 1; // aktualizowanie zegaru Lamporta
+    timestamp = std::max(timestamp, msg->current_timestamp) + 1; // aktualizowanie zegaru Lamporta
 
     switch (state) {
         case START:
@@ -132,7 +133,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-        if(wasDEN && count+1 <= COSTUME_QUANTITY){
+        if(wasDEN && count+1 > COSTUME_QUANTITY){
             std::thread thread(std::ref(*this));
             thread.detach();
         } else{
@@ -306,6 +307,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
         if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
+            sent_timestamp = -1;
             i("Dostałem statek!");
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
@@ -371,7 +373,8 @@ void Voyager::start_REQUESTING_VESSEL() {
     state = static_cast<State>(rand);  // ubieganie sie o randomowy statek
     i("Zaczynam domagać się statku!");
 
-    auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
+    auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
+    msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
@@ -384,8 +387,8 @@ void Voyager::start_REQUESTING_VESSEL(Resource resource) {
     state = static_cast<State>(resource);
     i("Zaczynam domagać się statku!");
 
-    auto msg = Message((sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp, id); // żadanie statku po uzyskaniu kostiumu
-    if (sent_timestamp == -1) {
+    auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
+    msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;    if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
     msg.msgType = REQ;

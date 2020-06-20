@@ -8,18 +8,19 @@
 Singleton* Singleton::INSTANCE = nullptr;
 
 void Singleton::create_custom_message_type() {
-    int blocklengths[7] = {1, 1, 1, 1, 1, 1, 1};
-    MPI_Datatype types[7] = {MPI_INT, MPI_INT, MPI_INT, MPI_UNSIGNED, MPI_INT, MPI_INT, MPI_INT};
-    MPI_Aint offsets[7];
+    int blocklengths[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MPI_Datatype types[8] = {MPI_INT, MPI_INT, MPI_INT, MPI_UNSIGNED, MPI_UNSIGNED, MPI_INT, MPI_INT, MPI_INT};
+    MPI_Aint offsets[8];
     offsets[0] = offsetof(struct Message, sender_id);
     offsets[1] = offsetof(struct Message, receiver_id);
     offsets[2] = offsetof(struct Message, info_type);
     offsets[3] = offsetof(struct Message, timestamp);
-    offsets[4] = offsetof(struct Message, data);
-    offsets[5] = offsetof(struct Message, msgType);
-    offsets[6] = offsetof(struct Message, resource);
+    offsets[4] = offsetof(struct Message, current_timestamp);
+    offsets[5] = offsetof(struct Message, data);
+    offsets[6] = offsetof(struct Message, msgType);
+    offsets[7] = offsetof(struct Message, resource);
 
-    if(MPI_Type_create_struct(7, blocklengths, offsets, types, &mpi_message_type)!=MPI_SUCCESS){
+    if(MPI_Type_create_struct(8, blocklengths, offsets, types, &mpi_message_type)!=MPI_SUCCESS){
         perror("nie dobrze");
     }
     MPI_Type_commit(&mpi_message_type);
@@ -37,7 +38,7 @@ Singleton Singleton::getInstance() {
 }
 
 Message::Message(unsigned int timestamp, int sender, int receiver) {
-    this->timestamp = timestamp;
+    this->current_timestamp = timestamp;
     this->sender_id = sender;
     this->receiver_id = receiver;
 }
