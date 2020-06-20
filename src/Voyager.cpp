@@ -47,6 +47,7 @@ void Voyager::receive_message() {
     switch (state) {
         case START:
             handle_START(msg);
+            handle_START(msg);
             break;
         case REQUESTING_COSTUME:
             handle_REQUESTING_COSTUME(msg);
@@ -76,7 +77,9 @@ void Voyager::handle_START(Message *msg) {
     switch (msg->msgType) {
 
         case DEN:
+            break;
         case REP: //
+            break;
         case ACK:
             e("To nie powinno sie wydarzyć", msg);
             break;
@@ -85,6 +88,7 @@ void Voyager::handle_START(Message *msg) {
             response.send();
             break;
         case OUT: // nie robi nic
+            break;
         case NOPE:
             break;
         case REQ:
@@ -156,8 +160,11 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
             response.send();
             break;
         case DEN:
+            break;
         case REP:
+            break;
         case ACK:
+            break;
         case NOPE:
             e("Nie powinno się zdarzyć", msg);
             break;
@@ -189,6 +196,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             ++count_all;
             break;
         case REP:
+            break;
         case DEN:
             e("Nie powinno się zdarzyć", msg);
             break;
@@ -209,11 +217,9 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
     }
 
     if (count_all == size - 1) { // kiedy otrzyma wszystkie odpowiedzi
-
+        count_all = count = 0;
         if (got_ACK) {
             state = HAVE_VESSEL;
-            count_all = 0;
-            count = 0;
         } else {
             auto out = Message(timestamp, id);
             out.msgType = OUT;
@@ -222,6 +228,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
             out.broadcast(size);
             start_SIGHTSEEING(out.data);
         }
+
 
     }
 }
@@ -243,7 +250,9 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
             send->msgType = NOPE;
             break;
         case OUT: // uznałem, że może się zdarzyć, że dwa lub więcej może się ubiegać o wpłynięcie, a skoro już wypłyneli to ignoruje to
+            break;
         case NOPE:
+            break;
         case ACK:
             delete send;
             return;
@@ -295,6 +304,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             }
             break;
         case ACK:
+            break;
         case NOPE:
             e("nie powinno wystąpić", msg);
             break;
