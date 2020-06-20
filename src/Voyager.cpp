@@ -3,7 +3,7 @@
 //
 
 #include "Voyager.h"
-#include <algorithm>
+//#include <algorithm>
 
 const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałem jeszcze raz definiować statyczną stałą, bo inaczej się obrażał
 
@@ -318,21 +318,32 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             }
         } else { // nie uzyskanie miejsca w statku
             if (!got_TIC_for->empty()) {
+                int mi = 0;
                 if (got_TIC_for->size() > 1) { // odmowy dla innych niż pierwszy
                     // małe dopasowanie aby następnie ubiegać się o statek do którego najlepiej się dopsuje/pozostawi najmniej miejsca
-                    std::sort(got_TIC_for->begin(), got_TIC_for->end(), comparator(volume));
+                    int min = vessel_capacity[got_TIC_for->at(0).resource] - (got_TIC_for->at(0).data + volume);
+                    for (size_t i = 1; i < got_TIC_for->size(); ++i) {
+                        if (min > vessel_capacity[got_TIC_for->at(i).resource] - (got_TIC_for->at(i).data + volume)) {
+                            mi = (int) i;
+                            min = vessel_capacity[got_TIC_for->at(i).resource] - (got_TIC_for->at(i).data + volume);
+                        }
+                    }
+
                     Message den(timestamp, id);
                     den.msgType = DEN;
                     for (size_t i = 1; i < got_TIC_for->size(); ++i) {
-                        den.receiver_id = got_TIC_for->at(i).sender_id;
-                        den.send();
+                        if (i != (size_t) mi) {
+                            den.receiver_id = got_TIC_for->at(i).sender_id;
+                            den.send();
+                        }
                     }
                 }
                 response.msgType = ACK;
-                response.receiver_id = got_TIC_for->at(0).sender_id;
+                response.receiver_id = got_TIC_for->at(mi).sender_id;
                 response.send();
-                start_REQUESTING_VESSEL(got_TIC_for->at(0).resource);
-            } else {
+                start_REQUESTING_VESSEL(got_TIC_for->at(mi).resource);
+                got_TIC_for->resize(0);
+            } else { // jeśli nie otrzymał, żadnego TICa
                 start_REQUESTING_VESSEL();
             }
         }
@@ -400,12 +411,4 @@ void Voyager::start_SIGHTSEEING(int time) {
 
 Voyager::~Voyager() {
     delete got_TIC_for;
-}
-
-Voyager::comparator::comparator(int x) {
-    this->x = x;
-}
-
-bool Voyager::comparator::operator()(Message i, Message j) const {
-    return std::abs(Voyager::vessel_capacity[i.resource] - (i.data + x)) < std::abs(Voyager::vessel_capacity[j.resource] - (j.data + x));
 }

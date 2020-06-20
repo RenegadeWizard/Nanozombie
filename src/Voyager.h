@@ -71,14 +71,6 @@ private:
 
     void sightseeing(int time);
 
-    struct comparator {
-        int x;
-
-        explicit comparator(int x);
-
-        bool operator()(Message i, Message j) const;
-    };
-
 };
 
 
