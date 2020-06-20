@@ -131,15 +131,16 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
+        if(wasDEN && count+1 <= COSTUME_QUANTITY){
+            std::thread thread(std::ref(*this));
+        } else{
+            costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
+            sent_timestamp = -1;
+            i("Dostałem kostium!");
+            start_REQUESTING_VESSEL();
+        }
         count = count_all = 0;
         wasDEN = false;
-        costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
-        sent_timestamp = -1;
-        start_REQUESTING_VESSEL();
-    } else {
-        count = count_all = 0;
-        wasDEN = false;
-        std::thread thread(std::ref(*this));
     }
 }
 
@@ -301,6 +302,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
         if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
+            i("Dostałem statek!");
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
                 den.msgType = NOPE;
@@ -316,11 +318,12 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                 response.broadcast(size);
                 start_SIGHTSEEING(response.data);
             } else if (vessel_capacity[vessel] - (count + volume) <= MAX_VOYAGER_VOLUME) { // sprawdzanie czy WANT_DEPARTURE
+                state = WANT_DEPARTURE;
+                i("Próbuję wypłynąć! " + std::to_string(count + volume));
                 response.msgType = TIC;
                 response.data = count + volume;
                 response.resource = vessel;
                 response.broadcast(size);
-                state = WANT_DEPARTURE;
             }
         } else { // nie uzyskanie miejsca w statku
             if (!got_TIC_for->empty()) {
@@ -412,6 +415,7 @@ void Voyager::sightseeing(int time) {
 
 void Voyager::start_SIGHTSEEING(int time) {
     state = SIGHTSEEING;
+    i("Zaczynam zwiedzać!");
     std::thread thread(&Voyager::sightseeing, this, time);
 }
 

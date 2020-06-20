@@ -23,7 +23,7 @@ public:
     void e(const std::string &msg, Message *data);
 
 
-    std::string msgType_to_string[7] = {"REQ", "DEN", "REP", "TIC", "ACK", "OUT", "RES"}; // pewnie nie najpiękniejsze rozwiązanie
+    std::string msgType_to_string[7] = {"REQ", "DEN", "REP", "TIC", "ACK", "OUT", "NOPE"}; // pewnie nie najpiękniejsze rozwiązanie
 
 protected:
     int id;

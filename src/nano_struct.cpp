@@ -82,6 +82,9 @@ char *state_to_string(State state) {
         case SIGHTSEEING:
             sprintf(text_state, "Zwiedzam...                    ");
             break;
+        case WANT_DEPARTURE:
+            sprintf(text_state, "Próbuję wyłynąć...             ");
+            break;
         default:
             sprintf(text_state, "Domagam się statku numer %d... ", state);
             break;

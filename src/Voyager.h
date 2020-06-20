@@ -24,7 +24,7 @@ public:
 
     void operator()();
 
-    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
+    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
 private:
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
