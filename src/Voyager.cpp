@@ -3,7 +3,6 @@
 //
 
 #include "Voyager.h"
-//#include <algorithm>
 
 const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałem jeszcze raz definiować statyczną stałą, bo inaczej się obrażał
 
@@ -133,7 +132,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-        if(wasDEN && count+1 > COSTUME_QUANTITY){
+        if(wasDEN || count+1 > COSTUME_QUANTITY){
             std::thread thread(std::ref(*this));
             thread.detach();
         } else{

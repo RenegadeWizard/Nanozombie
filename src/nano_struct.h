@@ -5,7 +5,7 @@
 #include <mpi.h>
 
 #define VESSEL_QUANTITY 10
-#define COSTUME_QUANTITY 2
+#define COSTUME_QUANTITY 60
 #define MAX_VOYAGER_VOLUME 7
 #define TAG 0
 
