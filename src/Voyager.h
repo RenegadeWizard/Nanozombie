@@ -24,8 +24,8 @@ public:
 
     void operator()();
 
+    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
 private:
-    constexpr static const int vessel_capacity[VESSEL_QUANTITY] = {10, 10, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
     int volume; // ile zajmuje dany turysta
@@ -70,6 +70,14 @@ private:
     void start_SIGHTSEEING(int time);
 
     void sightseeing(int time);
+
+    struct comparator {
+        int x;
+
+        explicit comparator(int x);
+
+        bool operator()(Message i, Message j) const;
+    };
 
 };
 

@@ -3,9 +3,9 @@
 //
 
 #include "Voyager.h"
-#include <cstdio>
-#include <unistd.h>
+#include <algorithm>
 
+const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałem jeszcze raz definiować statyczną stałą, bo inaczej się obrażał
 
 Voyager::Voyager(int id, int size) : Logger(id, START) {
     this->size = size;
@@ -292,7 +292,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
     }
 
     if (count_all == size - 1) {
-        if (!wasDEN && count + volume <= vessel_capacity[state]) { // uzyskanie statku
+        if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
@@ -303,7 +303,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                     den.send();
                 }
             }
-            if (vessel_capacity[vessel] == count + volume) { // sprawdzanie czy pełen
+            if (Voyager::vessel_capacity[vessel] == count + volume) { // sprawdzanie czy pełen
                 response.msgType = OUT;
                 response.resource = vessel;
                 response.data = get_RANDOM_NUMBER(10000, 60000);
@@ -318,10 +318,12 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             }
         } else { // nie uzyskanie miejsca w statku
             if (!got_TIC_for->empty()) {
-                if(got_TIC_for->size() > 1){ // odmowy dla innych niż pierwszy
+                if (got_TIC_for->size() > 1) { // odmowy dla innych niż pierwszy
+                    // małe dopasowanie aby następnie ubiegać się o statek do którego najlepiej się dopsuje/pozostawi najmniej miejsca
+                    std::sort(got_TIC_for->begin(), got_TIC_for->end(), comparator(volume));
                     Message den(timestamp, id);
                     den.msgType = DEN;
-                    for (int i = 1; i < got_TIC_for->size(); ++i) {
+                    for (size_t i = 1; i < got_TIC_for->size(); ++i) {
                         den.receiver_id = got_TIC_for->at(i).sender_id;
                         den.send();
                     }
@@ -400,3 +402,10 @@ Voyager::~Voyager() {
     delete got_TIC_for;
 }
 
+Voyager::comparator::comparator(int x) {
+    this->x = x;
+}
+
+bool Voyager::comparator::operator()(Message i, Message j) const {
+    return std::abs(Voyager::vessel_capacity[i.resource] - (i.data + x)) < std::abs(Voyager::vessel_capacity[j.resource] - (j.data + x));
+}
