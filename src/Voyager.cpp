@@ -3,11 +3,13 @@
 //
 
 #include "Voyager.h"
+#include <unistd.h>
 
 const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałem jeszcze raz definiować statyczną stałą, bo inaczej się obrażał
 
-Voyager::Voyager(int id, int size) : Logger(id, START) {
+Voyager::Voyager(int id, int size, MPI_Comm thread_comm) : Logger(id, START) {
     this->size = size;
+    this->thread_comm = thread_comm;
     got_TIC_for = new std::vector<Message>();
     volume = get_RANDOM_NUMBER(1, MAX_VOYAGER_VOLUME); // losowanie ile miejsca zajmuje dany turysta
     rng.seed(time(nullptr) ^ (id << 16));
@@ -19,7 +21,10 @@ void Voyager::operator()() {
 }
 
 void Voyager::wait_FOR_COSTUME() {  // TODO: wysyłaj z poprzednim timestamp'em
+    i("śpię");
     std::this_thread::sleep_for(std::chrono::milliseconds(get_RANDOM_NUMBER(500, 5000)));
+
+    i("nie śpię");
     mutex.lock();
     state = REQUESTING_COSTUME;
     i("Zaczynam domagać się kostiumu!");
@@ -81,7 +86,7 @@ void Voyager::handle_START(Message *msg) {
         case REP: //
             break;
         case ACK:
-            e("To nie powinno sie wydarzyć", msg);
+//            e("To nie powinno sie wydarzyć", msg);
             break;
         case TIC:
             response.msgType = NOPE;
@@ -126,9 +131,10 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             send->send();
             break;
         case NOPE: // ignorujemy
+        case OUT:
             break;
         default:
-            e("To sie nie powinno było wydarzyć", msg);
+//            e("To sie nie powinno było wydarzyć", msg);
             break;
     }
     delete send;
@@ -136,10 +142,16 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-        if(wasDEN || count+1 > COSTUME_QUANTITY){
-            std::thread thread(std::ref(*this));
-            thread.detach();
-        } else{
+        if (wasDEN || count + 1 > COSTUME_QUANTITY) {
+//            if (thread != nullptr) {
+//                delete thread;
+//                thread = nullptr;
+//            }
+//            thread = new std::thread(std::ref(*this));
+//            pthread_create(&pthread, nullptr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), this);
+//            thread.detach();
+            start_REQUESTIN_COSTUME(this, false);
+        } else {
             costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
             sent_timestamp = -1;
             i("Dostałem kostium!");
@@ -166,7 +178,7 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
         case ACK:
             break;
         case NOPE:
-            e("Nie powinno się zdarzyć", msg);
+//            e("Nie powinno się zdarzyć", msg);
             break;
         case TIC:
             response.msgType = NOPE;
@@ -198,7 +210,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
         case REP:
             break;
         case DEN:
-            e("Nie powinno się zdarzyć", msg);
+//            e("Nie powinno się zdarzyć", msg);
             break;
         case TIC:
             response.msgType = NOPE;
@@ -223,7 +235,7 @@ void Voyager::handle_WANT_DEPARTURE(Message *msg) {
         } else {
             auto out = Message(timestamp, id);
             out.msgType = OUT;
-            out.data = get_RANDOM_NUMBER(10000, 60000);
+            out.data = get_RANDOM_NUMBER(10, 20);
             out.resource = vessel;
             out.broadcast(size);
             start_SIGHTSEEING(out.data);
@@ -257,8 +269,9 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
             delete send;
             return;
         default:
-            e("To sie nie powinno było wydarzyć", msg);
-            break;
+//            e("To sie nie powinno było wydarzyć", msg);
+            delete send;
+            return;
     }
     send->send();
     delete send;
@@ -306,7 +319,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
         case ACK:
             break;
         case NOPE:
-            e("nie powinno wystąpić", msg);
+//            e("nie powinno wystąpić", msg);
             break;
         case OUT: // ignoruje
             break;
@@ -329,7 +342,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             if (Voyager::vessel_capacity[vessel] == count + volume) { // sprawdzanie czy pełen
                 response.msgType = OUT;
                 response.resource = vessel;
-                response.data = get_RANDOM_NUMBER(10000, 60000);
+                response.data = get_RANDOM_NUMBER(10, 20);
                 response.broadcast(size);
                 start_SIGHTSEEING(response.data);
             } else if (vessel_capacity[vessel] - (count + volume) <= MAX_VOYAGER_VOLUME) { // sprawdzanie czy WANT_DEPARTURE
@@ -397,7 +410,8 @@ void Voyager::start_REQUESTING_VESSEL(Resource resource) {
     i("Zaczynam domagać się statku!");
 
     auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
-    msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;    if (sent_timestamp == -1) {
+    msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;
+    if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
     msg.msgType = REQ;
@@ -421,7 +435,9 @@ void Voyager::resources_on_REQ(Message *response, Message *msg) {
 }
 
 void Voyager::sightseeing(int time) {
+    i("śpię");
     std::this_thread::sleep_for(std::chrono::milliseconds(time));
+    i("nie śpię");
     mutex.lock();
     state = START;
     i("Zaczynam odpoczywać!");
@@ -436,11 +452,55 @@ void Voyager::sightseeing(int time) {
 void Voyager::start_SIGHTSEEING(int time) {
     state = SIGHTSEEING;
     i("Zaczynam zwiedzać!");
-    std::thread thread(&Voyager::sightseeing, this, time);
-    thread.detach();
+//    std::thread thread(&Voyager::sightseeing, this, time);
+//    thread.detach();
+    time_to_sleep = time;
+    pthread_create(&pthread, nullptr, reinterpret_cast<void *(*)(void *)>(Voyager::sightseeing2), this);
+//    pthread_detach(pthread);
 }
 
 Voyager::~Voyager() {
     i("!!!!!!!!Zabiłem się!!!!!!!");
     delete got_TIC_for;
+}
+
+void Voyager::wait_FOR_COSTUME2(void *voyager) {
+    auto *th = (Voyager *) voyager;
+    th->i("spanko");
+    sleep(rand() % 15 + 5);
+    start_REQUESTIN_COSTUME(th, true);
+}
+
+void Voyager::sightseeing2(void *voyager) {
+    auto *th = (Voyager *) voyager;
+    th->i("zwiedzanie");
+    sleep((unsigned int) th->time_to_sleep);
+    th->i("po zwiedzaniu");
+    th->mutex.lock();
+    th->state = START;
+    th->i("Zaczynam odpoczywać!");
+    th->costume = static_cast<Resource>(-1);
+    th->vessel = static_cast<Resource>(-1);
+    th->count = 0;
+    th->count_all = 0;
+    th->mutex.unlock();
+    wait_FOR_COSTUME2(voyager);
+}
+
+void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
+    if(lock)
+        th->mutex.lock();
+    th->state = REQUESTING_COSTUME;
+    th->i("Zaczynam domagać się kostiumu!");
+    auto send = new Message(th->timestamp, th->id, 0);
+    send->timestamp = (th->sent_timestamp != -1) ? (unsigned int) th->sent_timestamp : th->timestamp;
+    if (th->sent_timestamp == -1) {
+        th->sent_timestamp = (int) th->timestamp;
+    }
+    send->msgType = REQ;
+    send->resource = COSTUME;
+    send->broadcast(th->size);
+    delete send;
+    if(lock)
+        th->mutex.unlock();
 }

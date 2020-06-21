@@ -16,7 +16,7 @@
 
 class Voyager : private Logger {
 public:
-    Voyager(int id, int size);
+    Voyager(int id, int size, MPI_Comm thread_comm);
 
     virtual ~Voyager();
 
@@ -25,6 +25,8 @@ public:
     void operator()();
 
     constexpr static int vessel_capacity[VESSEL_QUANTITY] = {15, 20, 24, 19, 20, 21, 16, 20, 18, 17};  // na razie tak to zainplementowałem, najwyżej później się zminu
+    static void wait_FOR_COSTUME2(void *voyager);
+
 private:
 //    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
@@ -34,6 +36,10 @@ private:
     unsigned int timestamp = 0;
     int sent_timestamp = -1;
     bool wasDEN = false;
+    MPI_Comm thread_comm;
+    std::thread *thread;
+    pthread_t pthread;
+    int time_to_sleep;
 //    State state = START;
     std::mt19937 rng;
     std::mutex mutex;
@@ -70,6 +76,10 @@ private:
     void start_SIGHTSEEING(int time);
 
     void sightseeing(int time);
+
+    static void sightseeing2(void *voyager);
+
+    static void start_REQUESTIN_COSTUME(Voyager *th, bool lock);
 
 };
 
