@@ -13,7 +13,7 @@ Voyager::Voyager(int id, int size, MPI_Comm thread_comm) : Logger(id, START) {
     unsigned int seed = time(nullptr);
 //    unsigned int seed = 1592725966;
     char err[250];
-    sprintf(err, "seed: %d",seed);
+    sprintf(err, "seed: %d", seed);
     i(err);
     srand(seed ^ (id << 16));
     rng.seed(seed ^ (id << 16));
@@ -115,8 +115,10 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
     switch (msg->msgType) {
         case REQ:
-            if (msg->resource == COSTUME && (msg->timestamp > (unsigned int) sent_timestamp
-                                             || (msg->timestamp == (unsigned int) sent_timestamp && msg->sender_id > id))) {
+            if (msg->resource == COSTUME && (msg->timestamp > (unsigned int) (sent_timestamp != -1) ? sent_timestamp : timestamp
+                                                                                                                       || (msg->timestamp == (unsigned int) (sent_timestamp != -1) ? sent_timestamp : timestamp &&
+                                                                                                                                                                                                      msg->sender_id >
+                                                                                                                                                                                                      id))) {
                 send->msgType = DEN;
             } else {
                 send->msgType = REP;
@@ -125,7 +127,9 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             send->send();
             break;
         case DEN:
+            count_all++;
             wasDEN = true;
+            check_VALID_COSTUME();
             break;
         case REP:
             count += msg->data;
@@ -148,18 +152,19 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
-        if (wasDEN || count + 1 > COSTUME_QUANTITY) {
+        if (wasDEN) {
 //            if (thread != nullptr) {
 //                delete thread;
 //                thread = nullptr;
 //            }
 //            thread = new std::thread(std::ref(*this));
+//            thread.detach();
+            start_REQUESTIN_COSTUME(this, false);
+        } else if (count + 1 > COSTUME_QUANTITY) {
             auto *attr = new pthread_attr_t;
             pthread_attr_init(attr);
             pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
             pthread_create(&pthread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), this);
-//            thread.detach();
-            start_REQUESTIN_COSTUME(this, false);
         } else {
             costume = COSTUME; // dopisałem dwie zmienne od kostiumu i statku (w logger),
             sent_timestamp = -1;
@@ -502,9 +507,10 @@ void Voyager::sightseeing2(void *voyager) {
 }
 
 void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
-    if(lock)
+    if (lock)
         th->mutex.lock();
     th->state = REQUESTING_COSTUME;
+    th->count_all = th->count = 0;
     th->i("Zaczynam domagać się kostiumu!");
     auto send = new Message(th->timestamp, th->id, 0);
     send->timestamp = (th->sent_timestamp != -1) ? (unsigned int) th->sent_timestamp : th->timestamp;
@@ -515,6 +521,6 @@ void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
     send->resource = COSTUME;
     send->broadcast(th->size);
     delete send;
-    if(lock)
+    if (lock)
         th->mutex.unlock();
 }

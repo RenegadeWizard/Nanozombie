@@ -29,14 +29,14 @@ void Logger::logger(bool error, const std::string &msg, Message *data) {
         perror(err);
     } else {
         if(data->msgType==REQ){
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d, %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, data->resource, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d, %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, data->resource, msg.c_str());
         } else if(data->msgType==REP){
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d, %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, data->data, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d, %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, data->data, msg.c_str());
         } else{
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, msg.c_str());
         }
     }
 
