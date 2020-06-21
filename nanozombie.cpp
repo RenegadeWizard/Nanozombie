@@ -34,7 +34,10 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
     auto *voyager = new Voyager(id, size, thread_comm);
-    pthread_create(&thread, nullptr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), voyager);
+    auto *attr = new pthread_attr_t;
+    pthread_attr_init(attr);
+    pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&thread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), voyager);
 //    std::thread thread(std::ref(*voyager));
 //    thread.detach();
 

@@ -10,9 +10,15 @@ const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałe
 Voyager::Voyager(int id, int size, MPI_Comm thread_comm) : Logger(id, START) {
     this->size = size;
     this->thread_comm = thread_comm;
+    unsigned int seed = time(nullptr);
+//    unsigned int seed = 1592725966;
+    char err[250];
+    sprintf(err, "seed: %d",seed);
+    i(err);
+    srand(seed ^ (id << 16));
+    rng.seed(seed ^ (id << 16));
     got_TIC_for = new std::vector<Message>();
     volume = get_RANDOM_NUMBER(1, MAX_VOYAGER_VOLUME); // losowanie ile miejsca zajmuje dany turysta
-    rng.seed(time(nullptr) ^ (id << 16));
     i("Zaczynamy");
 }
 
@@ -148,7 +154,10 @@ void Voyager::check_VALID_COSTUME() {
 //                thread = nullptr;
 //            }
 //            thread = new std::thread(std::ref(*this));
-//            pthread_create(&pthread, nullptr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), this);
+            auto *attr = new pthread_attr_t;
+            pthread_attr_init(attr);
+            pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
+            pthread_create(&pthread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), this);
 //            thread.detach();
             start_REQUESTIN_COSTUME(this, false);
         } else {
@@ -196,7 +205,7 @@ void Voyager::handle_HAVE_VESSEL(Message *msg) {
 
 // TODO: rozważyć usunięcie założenia o maksymalnym czasie transmisji (być może poprzez rozwinięcie structury o State state_in_request)
 void Voyager::handle_WANT_DEPARTURE(Message *msg) {
-    auto response = Message();
+    auto response = Message(timestamp, id, msg->sender_id);
 
     switch (msg->msgType) {
 
@@ -455,7 +464,10 @@ void Voyager::start_SIGHTSEEING(int time) {
 //    std::thread thread(&Voyager::sightseeing, this, time);
 //    thread.detach();
     time_to_sleep = time;
-    pthread_create(&pthread, nullptr, reinterpret_cast<void *(*)(void *)>(Voyager::sightseeing2), this);
+    auto *attr = new pthread_attr_t;
+    pthread_attr_init(attr);
+    pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&pthread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::sightseeing2), this);
 //    pthread_detach(pthread);
 }
 
@@ -475,6 +487,7 @@ void Voyager::sightseeing2(void *voyager) {
     auto *th = (Voyager *) voyager;
     th->i("zwiedzanie");
     sleep((unsigned int) th->time_to_sleep);
+//    sleep(1);
     th->i("po zwiedzaniu");
     th->mutex.lock();
     th->state = START;
@@ -485,6 +498,7 @@ void Voyager::sightseeing2(void *voyager) {
     th->count_all = 0;
     th->mutex.unlock();
     wait_FOR_COSTUME2(voyager);
+    th->i("Po odpoczywaniu");
 }
 
 void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
