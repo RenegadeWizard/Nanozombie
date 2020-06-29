@@ -4,13 +4,10 @@
 
 #include "Voyager.h"
 #include <unistd.h>
-//#include <fcntl.h>
 
 const int Voyager::vessel_capacity[];
 
 Voyager::Voyager(int id, int size, MPI_Comm thread_comm) : Logger(id, START) {
-//    messageToServe = new std::list<std::function<void(void)>>();
-//    sem_init(semaphore, 0, 0);
     this->size = size;
     this->thread_comm = thread_comm;
     unsigned int seed = time(nullptr);
@@ -485,12 +482,7 @@ void Voyager::start_SIGHTSEEING(int time) {
 
 Voyager::~Voyager() {
     i("!!!!!!!!Zabiłem się!!!!!!!");
-//    running_computing_thread = false;
-
-//    sem_destroy(semaphore);
-//    delete semaphore;
     delete got_TIC_for;
-//    delete messageToServe;
 }
 
 void Voyager::wait_FOR_COSTUME2(void *voyager) {
@@ -541,17 +533,3 @@ void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
     }
 }
 
-//void Voyager::computing_thread(void *voyager) {
-//    auto *th = static_cast<Voyager *>(voyager);
-//
-//    while (th->running_computing_thread) {
-//        sem_close(th->semaphore);
-//        if (!th->messageToServe->empty()) {
-//            th->messageToServe->front().operator()();
-//            th->messageToServe->pop_front();
-//        } else {
-//            th->i("!!!!brak zadan!!!!");
-//        }
-//    }
-//
-//}

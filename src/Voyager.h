@@ -13,9 +13,6 @@
 #include <mutex>
 #include <chrono>
 #include <vector>
-//#include <list>
-//#include <functional>
-//#include <semaphore.h>
 
 class Voyager : private Logger {
 public:
@@ -47,10 +44,6 @@ private:
 //    State state = START;
     std::mt19937 rng;
     std::mutex mutex;
-    /*sem_t *semaphore;
-    std::list<std::function<void(void)>> *messageToServe;
-    bool running_computing_thread = true;
-    pthread_t pthread_computing;*/
 
 
     void handle_START(Message *msg);
@@ -88,8 +81,6 @@ private:
     static void sightseeing2(void *voyager);
 
     static void start_REQUESTIN_COSTUME(Voyager *th, bool lock);
-
-//    static void computing_thread(void *voyager);
 
 };
 
