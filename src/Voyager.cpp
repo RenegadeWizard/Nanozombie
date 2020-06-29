@@ -4,10 +4,13 @@
 
 #include "Voyager.h"
 #include <unistd.h>
+//#include <fcntl.h>
 
-const int Voyager::vessel_capacity[]; // C++ jest czasami nie pojęty i musiałem jeszcze raz definiować statyczną stałą, bo inaczej się obrażał
+const int Voyager::vessel_capacity[];
 
 Voyager::Voyager(int id, int size, MPI_Comm thread_comm) : Logger(id, START) {
+//    messageToServe = new std::list<std::function<void(void)>>();
+//    sem_init(semaphore, 0, 0);
     this->size = size;
     this->thread_comm = thread_comm;
     unsigned int seed = time(nullptr);
@@ -57,10 +60,14 @@ void Voyager::receive_message() {
 
     switch (state) {
         case START:
+            costume = static_cast<Resource>(-1);
+            vessel = static_cast<Resource>(-1);
             handle_START(msg);
             handle_START(msg);
             break;
         case REQUESTING_COSTUME:
+            costume = static_cast<Resource>(-1);
+            vessel = static_cast<Resource>(-1);
             handle_REQUESTING_COSTUME(msg);
             break;
         case HAVE_VESSEL:
@@ -478,23 +485,29 @@ void Voyager::start_SIGHTSEEING(int time) {
 
 Voyager::~Voyager() {
     i("!!!!!!!!Zabiłem się!!!!!!!");
+//    running_computing_thread = false;
+
+//    sem_destroy(semaphore);
+//    delete semaphore;
     delete got_TIC_for;
+//    delete messageToServe;
 }
 
 void Voyager::wait_FOR_COSTUME2(void *voyager) {
-    auto *th = (Voyager *) voyager;
+    auto *th = static_cast<Voyager *>(voyager);
     th->i("spanko");
     sleep(rand() % 15 + 5);
     start_REQUESTIN_COSTUME(th, true);
+    return;
 }
 
 void Voyager::sightseeing2(void *voyager) {
-    auto *th = (Voyager *) voyager;
+    auto *th = static_cast<Voyager *>(voyager);
     th->i("zwiedzanie");
     sleep((unsigned int) th->time_to_sleep);
 //    sleep(1);
-    th->i("po zwiedzaniu");
     th->mutex.lock();
+    th->i("po zwiedzaniu");
     th->state = START;
     th->i("Zaczynam odpoczywać!");
     th->costume = static_cast<Resource>(-1);
@@ -504,14 +517,16 @@ void Voyager::sightseeing2(void *voyager) {
     th->mutex.unlock();
     wait_FOR_COSTUME2(voyager);
     th->i("Po odpoczywaniu");
+    pthread_exit(nullptr);
 }
 
 void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
-    if (lock)
+    if (lock) {
         th->mutex.lock();
+    }
     th->state = REQUESTING_COSTUME;
     th->count_all = th->count = 0;
-    th->i("Zaczynam domagać się kostiumu!");
+//    th->i("Zaczynam domagać się kostiumu!");
     auto send = new Message(th->timestamp, th->id, 0);
     send->timestamp = (th->sent_timestamp != -1) ? (unsigned int) th->sent_timestamp : th->timestamp;
     if (th->sent_timestamp == -1) {
@@ -521,6 +536,22 @@ void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
     send->resource = COSTUME;
     send->broadcast(th->size);
     delete send;
-    if (lock)
+    if (lock) {
         th->mutex.unlock();
+    }
 }
+
+//void Voyager::computing_thread(void *voyager) {
+//    auto *th = static_cast<Voyager *>(voyager);
+//
+//    while (th->running_computing_thread) {
+//        sem_close(th->semaphore);
+//        if (!th->messageToServe->empty()) {
+//            th->messageToServe->front().operator()();
+//            th->messageToServe->pop_front();
+//        } else {
+//            th->i("!!!!brak zadan!!!!");
+//        }
+//    }
+//
+//}
