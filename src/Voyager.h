@@ -22,14 +22,10 @@ public:
 
     void receive_message();
 
-    void operator()();
-
-//    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {15, 20, 24, 19, 20, 21, 16, 20, 18, 17};  // na razie tak to zainplementowałem, najwyżej później się zminu
-    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 7};  // na razie tak to zainplementowałem, najwyżej później się zminu
-    static void wait_FOR_COSTUME2(void *voyager);
+    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 7, 10, 10, 7, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
+    static void wait_FOR_COSTUME(void *voyager);
 
 private:
-//    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
     int volume; // ile zajmuje dany turysta
     int count = 0;
@@ -38,17 +34,13 @@ private:
     int sent_timestamp = -1;
     bool wasDEN = false;
     MPI_Comm thread_comm;
-    std::thread *thread;
     pthread_t pthread;
     int time_to_sleep;
-//    State state = START;
     std::mt19937 rng;
     std::mutex mutex;
 
 
     void handle_START(Message *msg);
-
-    void wait_FOR_COSTUME();
 
     void handle_REQUESTING_COSTUME(Message *msg);
 
@@ -76,9 +68,7 @@ private:
 
     void start_SIGHTSEEING(int time);
 
-    void sightseeing(int time);
-
-    static void sightseeing2(void *voyager);
+    static void sightseeing(void *voyager);
 
     static void start_REQUESTIN_COSTUME(Voyager *th, bool lock);
 

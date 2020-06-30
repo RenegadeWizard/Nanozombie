@@ -37,19 +37,13 @@ int main(int argc, char *argv[]) {
     auto *attr = new pthread_attr_t;
     pthread_attr_init(attr);
     pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&thread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME2), voyager);
-//    std::thread thread(std::ref(*voyager));
-//    thread.detach();
+    pthread_create(&thread, attr, reinterpret_cast<void *(*)(void *)>(Voyager::wait_FOR_COSTUME), voyager);
 
     while (true) {
         voyager->receive_message();
-//        voy.receive_message();
     }
 
-    delete
-            voyager;
-
+    delete voyager;
     MPI_Finalize();
-
     return 0;
 }
