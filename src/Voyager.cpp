@@ -219,6 +219,7 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
                 send->data = 1;
             } else {
                 send->msgType = REP;
+                send->data = 0;
             }
             send->send();
             break;
@@ -280,7 +281,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
             sent_timestamp = -1;
-            i("Dostałem statek! " + std::to_string(count));
+            i("Dostałem statek! " + std::to_string(count) + ",t " + std::to_string(timestamp));
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
                 den.msgType = NOPE;
@@ -353,9 +354,9 @@ void Voyager::start_REQUESTING_VESSEL() {
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
-//    i("Zaczynam domagać się statku! " + std::to_string(sent_timestamp));
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
+//    i("Zaczynam domagać się statku! " + std::to_string(sent_timestamp) + " " + std::to_string(msg.resource));
     msg.broadcast(size);
 }
 
@@ -421,12 +422,12 @@ void Voyager::sightseeing(void *voyager) {
     sigset_t mask;
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, nullptr);
-    th->i("zwiedzanie");
+    th->i("zwiedzanie " + std::to_string(th->timestamp));
 //    sleep((unsigned int) th->time_to_sleep);
     std::this_thread::sleep_for(std::chrono::seconds(th->time_to_sleep));
 //    th->i("po zspanku");
     th->mutex.lock();
-    th->i("po zwiedzaniu");
+    th->i("po zwiedzaniu " + std::to_string(th->timestamp));
     th->state = START;
     th->i("Zaczynam odpoczywać!");
     th->costume = static_cast<Resource>(-1);
