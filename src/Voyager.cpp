@@ -82,7 +82,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
 
     switch (msg->msgType) {
         case REQ:
-            if (msg->resource == COSTUME && (msg->timestamp > sent_timestamp || (msg->timestamp == sent_timestamp && msg->sender_id > id))) {
+            if (msg->resource == COSTUME && (msg->timestamp > (unsigned int) sent_timestamp || (msg->timestamp == (unsigned int) sent_timestamp && msg->sender_id > id))) {
                 send->msgType = DEN;
 //                i("moj " + std::to_string(sent_timestamp) + " otrzymany " + std::to_string(msg->timestamp) + ", " + std::to_string(count_all));
             } else {
@@ -245,6 +245,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                 if (msg->timestamp > (unsigned int) sent_timestamp || (msg->timestamp == (unsigned int) sent_timestamp && msg->sender_id > id)) {
                     response.msgType = DEN;
                 } else {
+                    wasDEN = true;
                     response.msgType = REP;
                     response.data = 0;
                 }
@@ -304,7 +305,9 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                 response.resource = vessel;
                 response.broadcast(size);
             }
-        } else { // nie uzyskanie miejsca w statku
+        } else if (wasDEN) { // nie uzyskanie miejsca w statku przez DEN
+            start_REQUESTING_VESSEL(static_cast<Resource>(state));
+        } else { //nie dosrtałem statku przez brak miejsca
             if (!got_TIC_for->empty()) {
                 int mi = 0;
                 if (got_TIC_for->size() > 1) { // odmowy dla innych niż pierwszy
@@ -369,7 +372,7 @@ void Voyager::start_REQUESTING_VESSEL(Resource resource) {
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
-    i("Zaczynam domagać się statku z TIC! " + std::to_string(sent_timestamp));
+//    i("Zaczynam domagać się statku z TIC! " + std::to_string(sent_timestamp));
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
     msg.broadcast(size);
