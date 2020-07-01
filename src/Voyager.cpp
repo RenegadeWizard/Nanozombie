@@ -235,6 +235,7 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
 
 void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
     Message response(timestamp, id, msg->sender_id);
+    std::vector<Message>::iterator it;
 
     switch (msg->msgType) {
 
@@ -277,12 +278,21 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             ++count_all;
             vesselAway = true;
             break;
+        case OUT:
+            it = got_TIC_for->begin();
+            while (it != got_TIC_for->end()) {
+                if (it->resource == msg->resource) {
+                    got_TIC_for->erase(it);
+                    break;
+                }
+            }
+            break;
         default:
             break;
     }
 
     if (count_all == size - 1) {
-        if (vesselAway) {
+        if (vesselAway) { // kiedy statek zwiedza
             if (!got_TIC_for->empty()) {
                 int mi = 0;
                 if (got_TIC_for->size() > 1) { // odmowy dla innych niż pierwszy
