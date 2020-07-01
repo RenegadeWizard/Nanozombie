@@ -213,7 +213,7 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
     switch (msg->msgType) {
         case REQ:
             if (msg->resource == vessel) {
-                send->msgType = DEN;
+                send->msgType = AWAY;
             } else if (msg->resource == COSTUME) {
                 send->msgType = REP;
                 send->data = 1;
@@ -273,12 +273,46 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                 }
             }
             break;
+        case AWAY:
+            ++count_all;
+            vesselAway = true;
+            break;
         default:
             break;
     }
 
     if (count_all == size - 1) {
-        if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
+        if (vesselAway) {
+            if (!got_TIC_for->empty()) {
+                int mi = 0;
+                if (got_TIC_for->size() > 1) { // odmowy dla innych niż pierwszy
+                    // małe dopasowanie aby następnie ubiegać się o statek do którego najlepiej się dopsuje/pozostawi najmniej miejsca
+                    int min = vessel_capacity[got_TIC_for->at(0).resource] - (got_TIC_for->at(0).data + volume);
+                    for (size_t i = 1; i < got_TIC_for->size(); ++i) {
+                        if (min > vessel_capacity[got_TIC_for->at(i).resource] - (got_TIC_for->at(i).data + volume)) {
+                            mi = (int) i;
+                            min = vessel_capacity[got_TIC_for->at(i).resource] - (got_TIC_for->at(i).data + volume);
+                        }
+                    }
+
+                    Message den(timestamp, id);
+                    den.msgType = NOPE;
+                    for (size_t i = 1; i < got_TIC_for->size(); ++i) {
+                        if (i != (size_t) mi) {
+                            den.receiver_id = got_TIC_for->at(i).sender_id;
+                            den.send();
+                        }
+                    }
+                }
+                response.msgType = ACK;
+                response.receiver_id = got_TIC_for->at(mi).sender_id;
+                response.send();
+                start_REQUESTING_VESSEL(got_TIC_for->at(mi).resource);
+                got_TIC_for->resize(0);
+            } else { // jeśli nie otrzymał, żadnego TICa
+                start_REQUESTING_VESSEL();
+            }
+        } else if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
             i("Dostałem statek! " + std::to_string(count) + ",t " + std::to_string(timestamp) + ",s " + std::to_string(sent_timestamp));
@@ -339,6 +373,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             }
         }
         wasDEN = false;
+        vesselAway = false;
         count = count_all = 0;
     }
 

@@ -48,6 +48,7 @@ private:
     void handle_SIGHTSEEING(Message *msg);
 
     std::vector<Message> *got_TIC_for;
+    bool vesselAway = false;
 
     void handle_REQUESTING_VESSEL(Message *msg);
 
