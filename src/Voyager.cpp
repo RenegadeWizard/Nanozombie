@@ -212,7 +212,7 @@ void Voyager::handle_SIGHTSEEING(Message *msg) {
     auto *send = new Message(timestamp, id, msg->sender_id);
     switch (msg->msgType) {
         case REQ:
-            if (msg->resource == (Resource) state) {
+            if (msg->resource == vessel) {
                 send->msgType = DEN;
             } else if (msg->resource == COSTUME) {
                 send->msgType = REP;
@@ -280,8 +280,8 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
         if (!wasDEN && count + volume <= Voyager::vessel_capacity[state]) { // uzyskanie statku
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
+            i("Dostałem statek! " + std::to_string(count) + ",t " + std::to_string(timestamp) + ",s " + std::to_string(sent_timestamp));
             sent_timestamp = -1;
-            i("Dostałem statek! " + std::to_string(count) + ",t " + std::to_string(timestamp));
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
                 den.msgType = NOPE;
