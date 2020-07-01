@@ -27,7 +27,6 @@ public:
 
 private:
     int size; // ilość wszystkich procesów
-    int volume; // ile zajmuje dany turysta
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;

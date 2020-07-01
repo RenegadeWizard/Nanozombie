@@ -280,7 +280,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
             vessel = static_cast<Resource>(state);
             state = HAVE_VESSEL;
             sent_timestamp = -1;
-            i("Dostałem statek!");
+            i("Dostałem statek! " + std::to_string(count));
             if (!got_TIC_for->empty()) { // odpowiedzi na TIC, odmowa
                 Message den(timestamp, id);
                 den.msgType = NOPE;
@@ -344,29 +344,31 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
  * Rozpoczęcie ubiegania się o statek
  */
 void Voyager::start_REQUESTING_VESSEL() {
+    count = count_all = 0;
     int rand = get_RANDOM_NUMBER(0, VESSEL_QUANTITY - 1);
     state = static_cast<State>(rand);  // ubieganie sie o randomowy statek
-//    i("Zaczynam domagać się statku!");
 
     auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
     msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
+//    i("Zaczynam domagać się statku! " + std::to_string(sent_timestamp));
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
     msg.broadcast(size);
 }
 
 void Voyager::start_REQUESTING_VESSEL(Resource resource) {
+    count = count_all = 0;
     state = static_cast<State>(resource);
-//    i("Zaczynam domagać się statku z TIC!");
 
     auto msg = Message(timestamp, id); // żadanie statku po uzyskaniu kostiumu
     msg.timestamp = (sent_timestamp == -1) ? timestamp : (unsigned int) sent_timestamp;
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
+    i("Zaczynam domagać się statku z TIC! " + std::to_string(sent_timestamp));
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
     msg.broadcast(size);

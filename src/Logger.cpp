@@ -11,10 +11,10 @@ void Logger::logger(bool error, const std::string &msg) {
 
     if (error) {
         char err[200];
-        sprintf(err, "[%d]\tKostium: %d | Statek: %d\t| %s |[%d] %s\n", id, (costume == COSTUME) ? 1 : 0, vessel, text_state, id, msg.c_str());
+        sprintf(err, "[%d]\tKostium: %d | Objetosc: %d | Statek: %d\t| %s |[%d] %s\n", id, (costume == COSTUME) ? 1 : 0, volume, vessel, text_state, id, msg.c_str());
         perror(err);
     } else {
-        printf("[%d]\tKostium: %d | Statek: %d\t| %s |[%d] %s\n", id, (costume == COSTUME) ? 1 : 0, vessel, text_state, id, msg.c_str());
+        printf("[%d]\tKostium: %d | Objetosc: %d | Statek: %d\t| %s |[%d] %s\n", id, (costume == COSTUME) ? 1 : 0, volume, vessel, text_state, id, msg.c_str());
     }
     delete[] text_state;
 }
