@@ -34,7 +34,6 @@ void Voyager::receive_message() {
             costume = static_cast<Resource>(-1);
             vessel = static_cast<Resource>(-1);
             handle_START(msg);
-//            handle_START(msg);
             break;
         case REQUESTING_COSTUME:
             costume = static_cast<Resource>(-1);
@@ -84,7 +83,6 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
         case REQ:
             if (msg->resource == COSTUME && (msg->timestamp > (unsigned int) sent_timestamp || (msg->timestamp == (unsigned int) sent_timestamp && msg->sender_id > id))) {
                 send->msgType = DEN;
-//                i("moj " + std::to_string(sent_timestamp) + " otrzymany " + std::to_string(msg->timestamp) + ", " + std::to_string(count_all));
             } else {
                 send->msgType = REP;
                 send->data = 0;
@@ -92,7 +90,6 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
             send->send();
             break;
         case DEN:
-//            i("DEN");
             count_all++;
             wasDEN = true;
             check_VALID_COSTUME();
@@ -112,16 +109,14 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
     delete send;
 }
 
-/*
+/**
  * Sprawdzanie ilości wiadomości oraz ilości kostiumów w użyciu
  */
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
         if (wasDEN) {
-//            i("again " + std::to_string(sent_timestamp));
             start_REQUESTIN_COSTUME(this, false);
         } else if (count + 1 > COSTUME_QUANTITY) {
-//            i("brakuje kostiumow");
             auto *attr = new pthread_attr_t;
             pthread_attr_init(attr);
             pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
@@ -389,7 +384,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
 
 }
 
-/*
+/**
  * Rozpoczęcie ubiegania się o statek
  */
 void Voyager::start_REQUESTING_VESSEL() {
@@ -404,7 +399,6 @@ void Voyager::start_REQUESTING_VESSEL() {
     }
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
-//    i("Zaczynam domagać się statku! " + std::to_string(sent_timestamp) + " " + std::to_string(msg.resource));
     msg.broadcast(size);
 }
 
@@ -417,7 +411,6 @@ void Voyager::start_REQUESTING_VESSEL(Resource resource) {
     if (sent_timestamp == -1) {
         sent_timestamp = (int) timestamp;
     }
-//    i("Zaczynam domagać się statku z TIC! " + std::to_string(sent_timestamp));
     msg.msgType = REQ;
     msg.resource = static_cast<Resource>(state);
     msg.broadcast(size);
@@ -459,7 +452,6 @@ void Voyager::wait_FOR_COSTUME(void *voyager) {
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, nullptr);
     th->i("spanko");
-//    sleep((unsigned int) (rand() % 15 + 5));
     std::this_thread::sleep_for(std::chrono::seconds(rand() % 15 + 5));
     start_REQUESTIN_COSTUME(th, true);
     return;
@@ -471,9 +463,7 @@ void Voyager::sightseeing(void *voyager) {
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, nullptr);
     th->i("zwiedzanie " + std::to_string(th->timestamp));
-//    sleep((unsigned int) th->time_to_sleep);
     std::this_thread::sleep_for(std::chrono::seconds(th->time_to_sleep));
-//    th->i("po zspanku");
     th->mutex.lock();
     th->i("po zwiedzaniu " + std::to_string(th->timestamp));
     th->state = START;

@@ -22,7 +22,7 @@ public:
 
     void receive_message();
 
-    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 7, 10, 10, 7, 10};  // na razie tak to zainplementowałem, najwyżej później się zminu
+    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 7, 10, 10, 7, 10};
     static void wait_FOR_COSTUME(void *voyager);
 
 private:
