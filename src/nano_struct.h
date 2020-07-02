@@ -4,8 +4,8 @@
 #include <string>
 #include <mpi.h>
 
-#define VESSEL_QUANTITY 10
-#define COSTUME_QUANTITY 190
+#define VESSEL_QUANTITY 6
+#define COSTUME_QUANTITY 20
 #define MAX_VOYAGER_VOLUME 7
 #define TAG 0
 
@@ -15,7 +15,7 @@ enum State : int { // od 0 do VESSEL_Q-1 są żądania poszczególnych łodzi, a
 };
 
 enum MessageType : int { // opisane w sprawozdaniu/jakimś opisie algorytmu
-    REQ, DEN, REP, TIC, ACK, OUT, NOPE
+    REQ, DEN, REP, TIC, ACK, OUT, NOPE, AWAY
 };
 
 enum Resource : int { // od 0 do VESSEL_Q-1 są to łodzie, a potem kostium

@@ -16,32 +16,30 @@
 
 class Voyager : private Logger {
 public:
-    Voyager(int id, int size);
+    Voyager(int id, int size, MPI_Comm thread_comm);
 
     virtual ~Voyager();
 
     void receive_message();
 
-    void operator()();
+    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {10, 7, 10, 10, 7, 10};
+    static void wait_FOR_COSTUME(void *voyager);
 
-    constexpr static int vessel_capacity[VESSEL_QUANTITY] = {15, 20, 24, 19, 20, 21, 16, 20, 18, 17};  // na razie tak to zainplementowałem, najwyżej później się zminu
 private:
-//    int id; // id procesu w którym wykonywany jest kod
     int size; // ilość wszystkich procesów
-    int volume; // ile zajmuje dany turysta
     int count = 0;
     int count_all = 0;
     unsigned int timestamp = 0;
     int sent_timestamp = -1;
     bool wasDEN = false;
-//    State state = START;
+    MPI_Comm thread_comm;
+    pthread_t pthread;
+    int time_to_sleep;
     std::mt19937 rng;
     std::mutex mutex;
 
 
     void handle_START(Message *msg);
-
-    void wait_FOR_COSTUME();
 
     void handle_REQUESTING_COSTUME(Message *msg);
 
@@ -50,6 +48,7 @@ private:
     void handle_SIGHTSEEING(Message *msg);
 
     std::vector<Message> *got_TIC_for;
+    bool vesselAway = false;
 
     void handle_REQUESTING_VESSEL(Message *msg);
 
@@ -69,7 +68,9 @@ private:
 
     void start_SIGHTSEEING(int time);
 
-    void sightseeing(int time);
+    static void sightseeing(void *voyager);
+
+    static void start_REQUESTIN_COSTUME(Voyager *th, bool lock);
 
 };
 

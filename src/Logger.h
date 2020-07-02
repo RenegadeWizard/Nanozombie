@@ -27,6 +27,7 @@ public:
 
 protected:
     int id;
+    int volume; // ile zajmuje dany turysta
     State state;
     Resource costume = static_cast<Resource>(-1);
     Resource vessel = static_cast<Resource>(-1);

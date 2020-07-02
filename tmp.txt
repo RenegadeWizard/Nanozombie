@@ -1,0 +1,121 @@
+[16]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Czekam na wypłynięcie statku... |[16] Dostałem statek! 0,t 101,s 71
+[16]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Zwiedzam...                     |[16] zwiedzanie 131	
+[16]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Zwiedzam...                     |[16] po zwiedzaniu 34276
+
+-----------------
+
+[9]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[9] Dostałem statek! 0,t 34762,s 16842
+[9]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[9] zwiedzanie 36385
+[9]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[9] po zwiedzaniu 95896
+
+[10]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[10] Dostałem statek! 1,t 35022,s 17781
+[10]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[10] zwiedzanie 36421
+[10]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[10] po zwiedzaniu 95896
+
+[23]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Czekam na wypłynięcie statku... |[23] Dostałem statek! 2,t 35392,s 17079
+[23]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[23] zwiedzanie 36474
+[23]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[23] po zwiedzaniu 95950
+
+[20]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[20] Dostałem statek! 6,t 35658,s 3137
+[20]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[20] zwiedzanie 36386
+[20]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[20] po zwiedzaniu 95881
+
+[22]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[22] Dostałem statek! 6,t 35761,s 616
+[22]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[22] zwiedzanie 36421
+[22]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[22] po zwiedzaniu 95838
+
+[12]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[12] Dostałem statek! 8,t 36274,s 5111
+[12]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[12] zwiedzanie 36497
+[12]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[12] po zwiedzaniu 95948
+
+-----------------
+
+[1]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Czekam na wypłynięcie statku... |[1] Dostałem statek! 0,t 144786,s 144132
+[1]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Zwiedzam...                     |[1] zwiedzanie 145119
+[1]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Zwiedzam...                     |[1] po zwiedzaniu 292589
+
+----------------
+
+[29]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[29] Dostałem statek! 0,t 292880,s 291666
+[29]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[29] zwiedzanie 293613
+
+[0]	Kostium: 1 | Objetosc: 7 | Statek: 0	| Czekam na wypłynięcie statku... |[0] Dostałem statek! 1,t 293201,s 292638
+[0]	Kostium: 1 | Objetosc: 7 | Statek: 0	| Zwiedzam...                     |[0] zwiedzanie 293628
+
+[25]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[25] Dostałem statek! 8,t 293394,s 291280
+[25]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[25] zwiedzanie 293619
+
+[12]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[12] Dostałem statek! 9,t 293575,s 292397
+[12]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[12] zwiedzanie 293577
+
+-----------------
+-----------------
+
+[0]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Czekam na wypłynięcie statku... |[0] Dostałem statek! 0,t 7362,s 7268
+[0]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[0] zwiedzanie 135661
+[0]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[0] po zwiedzaniu 249794
+
+[24]	Kostium: 1 | Objetosc: 2 | Statek: 0	| Czekam na wypłynięcie statku... |[24] Dostałem statek! 4,t 14246,s 14049
+[24]	Kostium: 1 | Objetosc: 2 | Statek: 0	| Zwiedzam...                     |[24] zwiedzanie 135622
+[24]	Kostium: 1 | Objetosc: 2 | Statek: 0	| Zwiedzam...                     |[24] po zwiedzaniu 249647
+
+-----------------
+
+[25]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Czekam na wypłynięcie statku... |[25] Dostałem statek! 0,t 267746,s 267664
+[25]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[25] zwiedzanie 267822
+[25]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[25] po zwiedzaniu 332723
+
+-----------------
+
+[17]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[17] Dostałem statek! 0,t 332898,s 268097
+[17]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[17] zwiedzanie 333204
+
+
+[7]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Czekam na wypłynięcie statku... |[7] Dostałem statek! 1,t 333095,s 268197
+[7]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[7] zwiedzanie 333206
+
+
+[28]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Czekam na wypłynięcie statku... |[28] Dostałem statek! 6,t 333199,s 268560
+[28]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[28] zwiedzanie 333205
+
+-----------------
+-----------------
+
+[15]	Kostium: 1 | Objetosc: 3 | Statek: 0	| Czekam na wypłynięcie statku... |[15] Dostałem statek! 0,t 164,s 122
+[15]	Kostium: 1 | Objetosc: 3 | Statek: 0	| Zwiedzam...                     |[15] zwiedzanie 195
+[15]	Kostium: 1 | Objetosc: 3 | Statek: 0	| Zwiedzam...                     |[15] po zwiedzaniu 52806
+
+----------------
+
+[17]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Czekam na wypłynięcie statku... |[17] Dostałem statek! 0,t 53273,s 1578
+[17]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[17] zwiedzanie 53943
+[17]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[17] po zwiedzaniu 159759
+
+[9]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Czekam na wypłynięcie statku... |[9] Dostałem statek! 5,t 53675,s 3023
+[9]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[9] zwiedzanie 53940
+[9]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[9] po zwiedzaniu 159842
+
+-----------------
+
+[14]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Czekam na wypłynięcie statku... |[14] Dostałem statek! 0,t 160322,s 83328
+[14]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[14] zwiedzanie 160764
+[14]	Kostium: 1 | Objetosc: 5 | Statek: 0	| Zwiedzam...                     |[14] po zwiedzaniu 238702
+
+[11]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Czekam na wypłynięcie statku... |[11] Dostałem statek! 5,t 160658,s 112084
+[11]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[11] zwiedzanie 160723
+[11]	Kostium: 1 | Objetosc: 4 | Statek: 0	| Zwiedzam...                     |[11] po zwiedzaniu 238561
+
+-----------------
+
+[6]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Czekam na wypłynięcie statku... |[6] Dostałem statek! 0,t 239089,s 211052
+[6]	Kostium: 1 | Objetosc: 1 | Statek: 0	| Zwiedzam...                     |[6] zwiedzanie 239700
+
+
+[8]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Czekam na wypłynięcie statku... |[8] Dostałem statek! 1,t 239376,s 211790
+[8]	Kostium: 1 | Objetosc: 6 | Statek: 0	| Zwiedzam...                     |[8] zwiedzanie 239638
+
+
+[28]	Kostium: 1 | Objetosc: 2 | Statek: 0	| Czekam na wypłynięcie statku... |[28] Dostałem statek! 7,t 239538,s 210721
+[28]	Kostium: 1 | Objetosc: 2 | Statek: 0	| Zwiedzam...                     |[28] zwiedzanie 239637
+
+
