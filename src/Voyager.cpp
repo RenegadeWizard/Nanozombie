@@ -493,7 +493,7 @@ void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
     }
     send->msgType = REQ;
     send->resource = COSTUME;
-    th->i("Zaczynam ubiegać się o kostium");
+//    th->i("Zaczynam ubiegać się o kostium");
     send->broadcast(th->size);
     delete send;
     if (lock) {

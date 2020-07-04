@@ -57,7 +57,7 @@ void Logger::e(const std::string &msg) {
 }
 
 void Logger::i(const std::string &msg, Message *data) {
-    logger(false, msg, data);
+//    logger(false, msg, data);
 }
 
 void Logger::e(const std::string &msg, Message *data) {
