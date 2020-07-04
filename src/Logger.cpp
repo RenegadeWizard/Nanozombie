@@ -29,14 +29,19 @@ void Logger::logger(bool error, const std::string &msg, Message *data) {
         perror(err);
     } else {
         if(data->msgType==REQ){
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d, %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, data->resource, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d, %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, data->resource, msg.c_str());
         } else if(data->msgType==REP){
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d, %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, data->data, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d, %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, data->data, msg.c_str());
+        } else if(data->msgType <= AWAY && data->msgType >= REQ){
+//            printf("[%d]\tTroche nie zjebana wiadomość | Otrzymana wiadomość: %d od %d | %s\n",
+//                   id, data->msgType, data->sender_id, msg.c_str());
+            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %s od %d | %s\n",
+                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, msgType_to_string[data->msgType].c_str(), data->sender_id, msg.c_str());
         } else{
-            printf("[%d]\tKostium: %d | Statek: %d\t| %s | Otrzymana wiadomość: %d od %d | %s\n",
-                   id, (costume == COSTUME) ? 1 : 0, vessel, text_state, data->msgType, data->sender_id, msg.c_str());
+            printf("[%d]\tTroche zjebana wiadomość | Otrzymana wiadomość: %d od %d | %s\n",
+                   id, data->msgType, data->sender_id, msg.c_str());
         }
     }
 
@@ -52,7 +57,7 @@ void Logger::e(const std::string &msg) {
 }
 
 void Logger::i(const std::string &msg, Message *data) {
-//    logger(false, msg, data);
+    logger(false, msg, data);
 }
 
 void Logger::e(const std::string &msg, Message *data) {

@@ -26,9 +26,6 @@ public:
     static void wait_FOR_COSTUME(void *voyager);
 
 private:
-    int size; // ilość wszystkich procesów
-    int count = 0;
-    int count_all = 0;
     unsigned int timestamp = 0;
     int sent_timestamp = -1;
     bool wasDEN = false;

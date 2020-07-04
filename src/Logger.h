@@ -23,12 +23,15 @@ public:
     void e(const std::string &msg, Message *data);
 
 
-    std::string msgType_to_string[7] = {"REQ", "DEN", "REP", "TIC", "ACK", "OUT", "NOPE"}; // pewnie nie najpiękniejsze rozwiązanie
+    std::string msgType_to_string[8] = {"REQ", "DEN", "REP", "TIC", "ACK", "OUT", "NOPE", "AWAY"}; // pewnie nie najpiękniejsze rozwiązanie
 
 protected:
     int id;
     int volume; // ile zajmuje dany turysta
+    int size; // ilość wszystkich procesów
     State state;
+    int count = 0;
+    int count_all = 0;
     Resource costume = static_cast<Resource>(-1);
     Resource vessel = static_cast<Resource>(-1);
 

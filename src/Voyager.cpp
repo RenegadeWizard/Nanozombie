@@ -114,6 +114,7 @@ void Voyager::handle_REQUESTING_COSTUME(Message *msg) {
  */
 void Voyager::check_VALID_COSTUME() {
     if (count_all == size - 1) {
+
         if (wasDEN) {
             start_REQUESTIN_COSTUME(this, false);
         } else if (count + 1 > COSTUME_QUANTITY) {
@@ -280,6 +281,7 @@ void Voyager::handle_REQUESTING_VESSEL(Message *msg) {
                     got_TIC_for->erase(it);
                     break;
                 }
+                it++;
             }
             break;
         default:
@@ -452,7 +454,7 @@ void Voyager::wait_FOR_COSTUME(void *voyager) {
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, nullptr);
     th->i("spanko");
-    std::this_thread::sleep_for(std::chrono::seconds(rand() % 15 + 5));
+//    std::this_thread::sleep_for(std::chrono::seconds(rand() % 15 + 5));
     start_REQUESTIN_COSTUME(th, true);
     return;
 }
@@ -463,7 +465,7 @@ void Voyager::sightseeing(void *voyager) {
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, nullptr);
     th->i("zwiedzanie " + std::to_string(th->timestamp));
-    std::this_thread::sleep_for(std::chrono::seconds(th->time_to_sleep));
+//    std::this_thread::sleep_for(std::chrono::seconds(th->time_to_sleep));
     th->mutex.lock();
     th->i("po zwiedzaniu " + std::to_string(th->timestamp));
     th->state = START;
@@ -491,6 +493,7 @@ void Voyager::start_REQUESTIN_COSTUME(Voyager *th, bool const lock) {
     }
     send->msgType = REQ;
     send->resource = COSTUME;
+    th->i("Zaczynam ubiegać się o kostium");
     send->broadcast(th->size);
     delete send;
     if (lock) {
